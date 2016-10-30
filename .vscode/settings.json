@@ -1,0 +1,6 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    "editor.wrappingColumn": 80,
+    "editor.wordWrap": true,
+    "editor.formatOnType": true,
+}
