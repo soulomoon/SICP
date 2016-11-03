@@ -14,5 +14,5 @@
 ;           m))))
 ; “I don’t see what difference that could make,” says Louis. “I do.” says Eva. “By writing the procedure like that, you have transformed the Θ(logn)Θ(log⁡n) process into a Θ(n)Θ(n) process.” Explain.
 
-; Because using square only compute (expmod base (/ exp 2) m) one in remainder, whereas write it seperately would dopulicate the comutation resulting.
-; more specific, the it should reduce /2, but here dupulicate the *2 cancell out the bonus.
+Because using square only compute (expmod base (/ exp 2) m) one in remainder, whereas write it seperately would dopulicate the comutation resulting.
+more specific, the it should reduce /2, but here dupulicate the *2 cancell out the bonus.

@@ -4,4 +4,4 @@
   (remainder (fast-expt base exp) m))
 
 
-; previous one mod each step reducing many unnessesary comutation
+previous one mod each step reducing many unnessesary comutation
