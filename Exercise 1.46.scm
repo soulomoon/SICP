@@ -27,4 +27,25 @@
     ((iterative_improve sqrt_good_enough? improve) 1.0)
 )
 
+;fixed-point
+(define (fixed-point f first-guess)
+    (define (close-enough? x)
+        (< (abs (- x (f x))) tolerance))
+
+    (define (improve x)
+        (f x)
+    )
+    ((iterative_improve close-enough? improve) 1.0)
+)
+
+
+
 (sqrt 4)
+(fixed-point cos 1.0)
+
+``````````````````````````````````
+Welcome to DrRacket, version 6.6 [3m].
+Language: planet neil/sicp, with debugging; memory limit: 128 MB.
+2.0000000929222947
+0.7395672022122561
+>
