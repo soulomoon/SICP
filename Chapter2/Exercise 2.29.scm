@@ -10,21 +10,17 @@
 ; Using your selectors, define a procedure total-weight that returns the total weight of a mobile.
 ; A mobile is said to be balanced if the torque applied by its top-left branch is equal to that applied by its top-right branch (that is, if the length of the left rod multiplied by the weight hanging from that rod is equal to the corresponding product for the right side) and if each of the submobiles hanging off its branches is balanced. Design a predicate that tests whether a binary mobile is balanced.
 ; Suppose we change the representation of mobiles so that the constructors are
-; (define (make-mobile left right)
-;   (cons left right))
+(define (make-mobile left right)
+  (cons left right))
 
-; (define (make-branch length structure)
-;   (cons length structure))
-; How much do you need to change your programs to convert to the new representation?
+(define (make-branch length structure)
+  (cons length structure))
+How much do you need to change your programs to convert to the new representation?
 (define (make-mobile left right)
   (list left right))
 
 (define (make-branch length structure)
   (list length structure))
-;selectors
-(define (left_branch mobile)
-    (car mobile)
-)
 (define (right_branch mobile)
     (cadr mobile)
 )
@@ -32,12 +28,16 @@
 (define (get_structure branch)
     (cadr branch)
  )
+;1selectors
+(define (left_branch mobile)
+    (car mobile)
+)
 
 (define (get_length branch)
     (car branch)
 )
 
-;total_weight
+;2total_weight
 (define (total_weight mobile)
     (define (get_structure_size item)
         (if (pair? item)
@@ -56,7 +56,7 @@
     )
 )
 
-;balanced
+;3balanced
 (define (mobile_balanced? mobile) 
     (define (get_weight structure)
         (if (pair? structure)
@@ -89,6 +89,20 @@
     )
 )
 
+;4 list to cons 
+; (define (make-mobile left right)
+;   (cons left right))
+
+; (define (make-branch length structure)
+;   (cons length structure))
+
+; (define (right_branch mobile)
+;     (cdr mobile)
+; )
+
+; (define (get_structure branch)
+;     (cdr branch)
+;  )
 
 
 (define l (make-branch 3 2))
@@ -107,6 +121,16 @@
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
 ; {mcons 3 {mcons 2 '()}}
 ; {mcons 2 {mcons 3 '()}}
+; 3
+; 3
+; 5
+; #t
+; #t
+; > 
+
+;4
+; {mcons 3 2}
+; {mcons 2 3}
 ; 3
 ; 3
 ; 5
