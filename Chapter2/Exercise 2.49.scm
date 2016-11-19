@@ -13,6 +13,11 @@
 (define draw (draw-viewport vp))
 (define (clear) ((clear-viewport vp)))
 (define line (draw-line vp))
+(define (drawline begine end)
+    (line
+        (make-posn (car begine) (cadr begine)) 
+        (make-posn (car end) (cadr end)))
+)
 
 (define (make_vect x y)
     (list x y)
@@ -41,6 +46,7 @@
                   (edge1_frame frame))
       (scale_vect (ycor_vect v)
                   (edge2_frame frame))))))
+                  
 (define (make_segment vector1 vector2)
     (list vector1 vector2)
 )
@@ -61,19 +67,19 @@
 (define (edge1_frame frame) (cadr frame))
 (define (edge2_frame frame) (caddr frame))
 
-(define (segments_>painter segment_list)
+(define (segments_>painter segment-list)
   (lambda (frame)
     (for-each
      (lambda (segment)
-       (let ((start_coord_map ((frame_coord_map frame) (start_segment segment)))
-             (end_coord_map ((frame_coord_map frame) (end_segment segment))))
-       (line
-        (make-posn (xcor_vect start_coord_map) (ycor_vect start_coord_map))
-        (make-posn (xcor_vect end_coord_map) (ycor_vect end_coord_map)))))
-     segment_list)))
+       (drawline
+        ((frame_coord_map frame) 
+         (start_segment segment))
+        ((frame_coord_map frame) 
+         (end_segment segment))))
+     segment-list)))
 
 
-(define unit_frame (make_frame (make_vect 0 500) (make_vect 500 0) (make_vect 0 -500)))
+(define unit_frame (make_frame (make_vect 0 100) (make_vect 100 0) (make_vect 0 100)))
 
 ;1 outline
 (define outline_drawer
@@ -152,30 +158,7 @@
     )
 )
 ; 4.wave(I dont want to draw - -//// onz)
-(define D_drawer
-    (let 
-        (
-            (a (make_vect 0.5 0))
-            (b (make_vect 0 0.5))
-            (c (make_vect 0.5 1))
-            (d (make_vect 1 0.5))
-            
-        )
-        (let
-            (
-                (
-                    segment_list 
-                    (list 
-                        (make_segment a b)
-                        (make_segment a d)
-                        (make_segment b c)
-                        (make_segment c d)
-                    )
-                )
-            )
-            (segments_>painter segment_list)
-        )
-    )
-)
 
+
+(outline_drawer unit_frame)
 (D_drawer unit_frame)
