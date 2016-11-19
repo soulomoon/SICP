@@ -1,3 +1,7 @@
+; Exercise 2.56: Show how to extend the basic differentiator to handle more kinds of expressions. For instance, implement the differentiation rule
+; d(un)dx=nun−1dudx
+; d(un)dx=nun−1dudx
+; by adding a new clause to the deriv program and defining appropriate procedures exponentiation?, base, exponent, and make-exponentiation. (You may use the symbol ** to denote exponentiation.) Build in the rules that anything raised to the power 0 is 1 and anything raised to the power 1 is the thing itself.
 (define (deriv exp var)
   (cond ((number? exp) 0)
         ((variable? exp)
@@ -5,6 +9,7 @@
         ((sum? exp)
          (make-sum (deriv (addend exp) var)
                    (deriv (augend exp) var)))
+
         ((product? exp)
          (make-sum
           (make-product 
@@ -12,7 +17,23 @@
            (deriv (multiplicand exp) var))
           (make-product 
            (deriv (multiplier exp) var)
-           (multiplicand exp))))
+           (multiplicand exp)))
+        )
+
+        ((exponentiation? exp)
+        (make-product
+            (make-product
+                n
+                (make-exponentiation 
+                    u
+                    (- n 1)
+                )
+            )
+            (deriv
+                (base exp)
+                var
+            )
+        )
         (else (error "unknown expression 
                       type: DERIV" exp))))
 
@@ -59,6 +80,20 @@
 (define (multiplier p) (cadr p))
 ; The multiplicand is the third item of the product list:
 (define (multiplicand p) (caddr p))
+
+(define (exponentiation? x)
+  (and (pair? x) (eq? (car x) '**)))
+
+(define (base s) (cadr s))
+(define (exponent s) (cadr s))
+
+(define (make-exponentiation base exponent)
+  (cond ((= base 0) 0)
+        ((= exponent 0) 1)
+        ((= exponent 1) base)
+        (else (list '** base exponent))))
+
+
 
 
 (display (deriv '(+ x 3) 'x)) (newline)
