@@ -1,7 +1,7 @@
-; Exercise 2.56: Show how to extend the basic differentiator to handle more kinds of expressions. For instance, implement the differentiation rule
-; d(un)dx=nun−1dudx
-; d(un)dx=nun−1dudx
-; by adding a new clause to the deriv program and defining appropriate procedures exponentiation?, base, exponent, and make-exponentiation. (You may use the symbol ** to denote exponentiation.) Build in the rules that anything raised to the power 0 is 1 and anything raised to the power 1 is the thing itself.
+; Exercise 2.57: Extend the differentiation program to handle sums and products of arbitrary numbers of (two or more) terms. Then the last example above could be expressed as
+
+; (deriv '(* x y (+ x 3)) 'x)
+; Try to do this by changing only the representation for sums and products, without changing the deriv procedure at all. For example, the addend of a sum would be the first term, and the augend would be the sum of the rest of the terms.
 (define (deriv exp var)
   (cond ((number? exp) 0)
         ((variable? exp)
@@ -72,14 +72,22 @@
 ; The addend is the second item of the sum list:
 (define (addend s) (cadr s))
 ; The augend is the third item of the sum list:
-(define (augend s) (caddr s))
+(define (augend s) 
+    (if (null? (cdddr s))
+        (caddr s)
+        (cons '+ (cddr s)))
+)
 ; A product is a list whose first element is the symbol *:
 (define (product? x)
   (and (pair? x) (eq? (car x) '*)))
 ; The multiplier is the second item of the product list:
 (define (multiplier p) (cadr p))
 ; The multiplicand is the third item of the product list:
-(define (multiplicand p) (caddr p))
+(define (multiplicand p) 
+        (if (null? (cdddr p))
+        (caddr p)
+        (cons '* (cddr p)))
+)
 
 (define (exponentiation? x)
   (and (pair? x) (eq? (car x) '**)))
@@ -102,16 +110,10 @@
 (display (deriv '(* x y) 'x)) (newline)
 ; (+ (* x 0) (* 1 y))
 
-(display (deriv '(* (* x y) (+ x 3)) 'x)) (newline)
+(display (deriv '(* x y (+ x 3)) 'x)) (newline)
 ; (+ (* (* x y) (+ 1 0))
 ;    (* (+ (* x 0) (* 1 y))
 ;       (+  x 3)))
-(display (deriv '(** x 3) 'x)) (newline)
 
-Welcome to DrRacket, version 6.7 [3m].
-Language: SICP (PLaneT 1.18); memory limit: 128 MB.
-1
-y
-(+ (* x y) (* y (+ x 3)))
-(* 3 (** x 2))
-> 
+; (display (deriv '(** x 3) 'x)) (newline)
+

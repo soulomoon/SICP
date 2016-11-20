@@ -3,4 +3,5 @@
     "editor.wrappingColumn": 80,
     "editor.wordWrap": true,
     "editor.formatOnType": true,
+    "editor.wordSeparators": "`"
 }

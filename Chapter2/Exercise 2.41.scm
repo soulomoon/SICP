@@ -13,7 +13,7 @@
                (filter predicate 
                        (cdr sequence))))
         (else  (filter predicate 
-                       (cdr sequence)))))                      
+                       (cdr sequence)))))                    
 
 (define (enumerate-interval low high)
   (if (> low high)

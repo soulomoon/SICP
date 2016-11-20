@@ -1,7 +1,7 @@
-; Exercise 2.56: Show how to extend the basic differentiator to handle more kinds of expressions. For instance, implement the differentiation rule
-; d(un)dx=nun−1dudx
-; d(un)dx=nun−1dudx
-; by adding a new clause to the deriv program and defining appropriate procedures exponentiation?, base, exponent, and make-exponentiation. (You may use the symbol ** to denote exponentiation.) Build in the rules that anything raised to the power 0 is 1 and anything raised to the power 1 is the thing itself.
+; Exercise 2.58: Suppose we want to modify the differentiation program so that it works with ordinary mathematical notation, in which + and * are infix rather than prefix operators. Since the differentiation program is defined in terms of abstract data, we can modify it to work with different representations of expressions solely by changing the predicates, selectors, and constructors that define the representation of the algebraic expressions on which the differentiator is to operate.
+
+; Show how to do this in order to differentiate algebraic expressions presented in infix form, such as (x + (3 * (x + (y + 2)))). To simplify the task, assume that + and * always take two arguments and that expressions are fully parenthesized.
+; The problem becomes substantially harder if we allow standard algebraic notation, such as (x + 3 * (x + y + 2)), which drops unnecessary parentheses and assumes that multiplication is done before addition. Can you design appropriate predicates, selectors, and constructors for this notation such that our derivative program still works?
 (define (deriv exp var)
   (cond ((number? exp) 0)
         ((variable? exp)
@@ -51,7 +51,7 @@
         ((=number? a2 0) a1)
         ((and (number? a1) (number? a2)) 
          (+ a1 a2))
-        (else (list '+ a1 a2))))
+        (else (list a1 '+ a2))))
 
 
 (define (=number? exp num)
@@ -65,21 +65,25 @@
         ((=number? m2 1) m1)
         ((and (number? m1) (number? m2)) 
          (* m1 m2))
-        (else (list '* m1 m2))))
+        (else (list m1 '* m2))))
 ; A sum is a list whose first element is the symbol +:
 (define (sum? x)
-  (and (pair? x) (eq? (car x) '+)))
+  (and (pair? x) (eq? (cadr x) '+)))
 ; The addend is the second item of the sum list:
-(define (addend s) (cadr s))
+(define (addend s) (car s))
 ; The augend is the third item of the sum list:
-(define (augend s) (caddr s))
+(define (augend s) 
+    (caddr s)
+)
 ; A product is a list whose first element is the symbol *:
 (define (product? x)
-  (and (pair? x) (eq? (car x) '*)))
+  (and (pair? x) (eq? (cadr x) '*)))
 ; The multiplier is the second item of the product list:
-(define (multiplier p) (cadr p))
+(define (multiplier p) (car p))
 ; The multiplicand is the third item of the product list:
-(define (multiplicand p) (caddr p))
+(define (multiplicand p) 
+    (caddr p)
+)
 
 (define (exponentiation? x)
   (and (pair? x) (eq? (car x) '**)))
@@ -96,22 +100,22 @@
 
 
 
-(display (deriv '(+ x 3) 'x)) (newline)
-; (+ 1 0)
+    (display (deriv '(x + 3) 'x)) (newline)
+    ; (+ 1 0)
 
-(display (deriv '(* x y) 'x)) (newline)
-; (+ (* x 0) (* 1 y))
+    (display (deriv '(x * y) 'x)) (newline)
+    ; (+ (* x 0) (* 1 y))
 
-(display (deriv '(* (* x y) (+ x 3)) 'x)) (newline)
-; (+ (* (* x y) (+ 1 0))
-;    (* (+ (* x 0) (* 1 y))
-;       (+  x 3)))
-(display (deriv '(** x 3) 'x)) (newline)
+    (display (deriv '((x * y) * (3 + 10)) 'x)) (newline)
+    ; (+ (* (* x y) (+ 1 0))
+    ;    (* (+ (* x 0) (* 1 y))
+    ;       (+  x 3)))
 
-Welcome to DrRacket, version 6.7 [3m].
-Language: SICP (PLaneT 1.18); memory limit: 128 MB.
-1
-y
-(+ (* x y) (* y (+ x 3)))
-(* 3 (** x 2))
-> 
+    ; (display (deriv '(** x 3) 'x)) (newline)
+
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
+; 1
+; y
+; (y * (3 + 10))
+; > 
