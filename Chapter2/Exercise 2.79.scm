@@ -53,10 +53,12 @@
 )
 
 (define (contents datum)
-  (if (pair? datum)
-      (cdr datum)
-      (error "Bad tagged datum: 
-              CONTENTS" datum)))
+    (cond 
+        ((number? datum) datum)
+        ((pair? datum) (cdr datum))
+        (else (error "Bad tagged datum: CONTENTS" datum))
+    )
+)
 
 (define (apply-generic op . args)
   (let ((type-tags (map type-tag args)))
@@ -73,7 +75,7 @@
 (define (install-scheme-number-package)
   
   (define (tag x)
-    (attach-tag 'scheme-number x))
+    x)
   (put 'equ? '(scheme-number scheme-number)
        (lambda (x y) (tag (= x y))))
   (put 'add '(scheme-number scheme-number)
@@ -86,8 +88,8 @@
        (lambda (x y) (tag (/ x y))))
   (put 'make 'scheme-number
        (lambda (x) (tag x)))
-  'done)
-
+  'scheme-number-package-done)
+(install-scheme-number-package)
 
 
 (define (install-rational-package)
@@ -120,6 +122,9 @@
   )
   ;; interface to rest of the system
   (define (tag x) (attach-tag 'rational x))
+  (put 'equ? '(rational rational)
+    equ?
+  )
   (put 'add '(rational rational)
        (lambda (x y) (tag (add-rat x y))))
   (put 'sub '(rational rational)
@@ -132,8 +137,6 @@
        (lambda (n d) (tag (make-rat n d))))
   'rational-package-done)
 (install-rational-package)
-(define (make-rational n d)
-  ((get 'make 'rational) n d))
 
 (define (install-rectangular-package)
   ;; internal procedures
@@ -258,7 +261,8 @@
 (define (equ? x y) (apply-generic 'equ? x y))
 (define (make-scheme-number n)
   ((get 'make 'scheme-number) n))
-
+(define (make-rational n d)
+  ((get 'make 'rational) n d))
 
 
 (define (make-complex-from-real-imag x y)
@@ -276,9 +280,13 @@
 
 (define a (make-complex-from-real-imag 1 2))
 (define b (make-complex-from-real-imag 1 3))
+(define c (make-rational 1 2))
+(define d (make-rational 1 3))
 (display (equ? a a))(newline)
 (display (equ? a b))(newline)
 (display (equ? 1 1))(newline)
 (display (equ? 1 2))(newline)
+(display (equ? c c))(newline)
+(display (equ? c d))(newline)
 
 (define (equ? x y) (apply-generic 'equ? x y))
