@@ -290,3 +290,19 @@
 (display (equ? c d))(newline)
 
 (define (equ? x y) (apply-generic 'equ? x y))
+
+
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
+; 'scheme-number-package-done
+; 'rational-package-done
+; 'rectangular-package-done
+; 'polar-package-done
+; 'complex-package-done
+; #t
+; #f
+; #t
+; #f
+; #t
+; #f
+; > 
