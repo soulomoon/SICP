@@ -2,7 +2,6 @@
 
 (define (make-table)
   (let ((local-table (list '*table*)))
-
     (define (lookup key-1 key-2)
       (let ((subtable (assoc key-1 (cdr local-table))))
         (if subtable
@@ -11,7 +10,6 @@
                   (cdr record)
                   false))
             false)))
-
     (define (insert! key-1 key-2 value)
       (let ((subtable (assoc key-1 (cdr local-table))))
         (if subtable
@@ -26,19 +24,19 @@
                                   (cons key-2 value))
                             (cdr local-table)))))
       'ok)
-
     (define (dispatch m)
       (cond ((eq? m 'lookup-proc) lookup)
             ((eq? m 'insert-proc!) insert!)
             (else (error "Unknown operation -- TABLE" m))))
-
     dispatch))
-
 
 (define operation-table (make-table))
 (define get (operation-table 'lookup-proc))
 (define put (operation-table 'insert-proc!))
 
+(define coercion-table (make-table))
+(define get-coercion (coercion-table 'lookup-proc))
+(define put-coercion (coercion-table 'insert-proc!))
 
 (define (attach-tag type-tag contents)
   (cons type-tag contents))
@@ -302,28 +300,4 @@
 
 (define (equ? x y) (apply-generic 'equ? x y))
 
-(define a (make-complex-from-real-imag 0 0))
-(define b (make-complex-from-real-imag 1 0))
-(define c (make-rational 0 3))
-(define d (make-rational 1 3))
-(display (=zero? a))(newline)
-(display (=zero? b))(newline)
-(display (=zero? 0))(newline)
-(display (=zero? 1))(newline)
-(display (=zero? c))(newline)
-(display (=zero? d))(newline)
 
-; Welcome to DrRacket, version 6.7 [3m].
-; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
-; 'scheme-number-package-done
-; 'rational-package-done
-; 'rectangular-package-done
-; 'polar-package-done
-; 'complex-package-done
-; #t
-; #f
-; #t
-; #f
-; #t
-; #f
-; > 
