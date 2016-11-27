@@ -273,7 +273,7 @@
              APPLY-GENERIC"
             (list op type-tags))))))
 
-(define (add x y) (apply-generic 'add x y))
+(define (add . args) (apply apply-generic (cons 'add args)))
 (define (sub x y) (apply-generic 'sub x y))
 (define (mul x y) (apply-generic 'mul x y))
 (define (div x y) (apply-generic 'div x y))

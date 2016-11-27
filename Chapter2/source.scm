@@ -127,6 +127,8 @@
        (lambda (x y) (tag (div-rat x y))))
   (put 'make 'rational
        (lambda (n d) (tag (make-rat n d))))
+  (put 'numer '(rational) numer)
+  (put 'denom '(rational) denom)
   'rational-package-done)
 (install-rational-package)
 
@@ -271,7 +273,7 @@
              APPLY-GENERIC"
             (list op type-tags))))))
 
-(define (add x y) (apply-generic 'add x y))
+(define (add . args) (apply apply-generic (cons 'add args)))
 (define (sub x y) (apply-generic 'sub x y))
 (define (mul x y) (apply-generic 'mul x y))
 (define (div x y) (apply-generic 'div x y))
@@ -280,7 +282,12 @@
   ((get 'make 'scheme-number) n))
 (define (make-rational n d)
   ((get 'make 'rational) n d))
-
+(define (numer z) 
+  (apply-generic 'numer z))
+(define (denom z) 
+  (apply-generic 'denom z))
+(define d (make-rational 1 3))
+(numer d)
 
 (define (make-complex-from-real-imag x y)
   ((get 'make-from-real-imag 'complex) x y))
