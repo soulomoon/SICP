@@ -38,6 +38,10 @@
 (define get-coercion (coercion-table 'lookup-proc))
 (define put-coercion (coercion-table 'insert-proc!))
 
+(define level-table (make-table))
+(define get-level (level-table 'lookup-proc))
+(define put-level (level-table 'insert-proc!))
+
 (define (attach-tag type-tag contents)
   (cons type-tag contents))
 
@@ -57,6 +61,30 @@
         (else (error "Bad tagged datum: CONTENTS" datum))
     )
 )
+
+(define (install-integer-package)
+  (define (tag x)
+    (cons 'integer x))
+  (put '=zero? '(integer)
+       (lambda (x) (tag (= x 0))))
+  (put 'value '(integer)
+    (lambda (x) x)
+  )
+  (put 'equ? '(integer integer)
+       (lambda (x y) (tag (round (= x y)))))
+  (put 'add '(integer integer)
+       (lambda (x y) (tag (round (+ x y)))))
+  (put 'sub '(integer integer)
+       (lambda (x y) (tag (round (- x y)))))
+  (put 'mul '(integer integer)
+       (lambda (x y) (tag (round (* x y)))))
+  (put 'div '(integer integer)
+       (lambda (x y) (tag (round (/ x y)))))
+  (put 'make 'integer
+       (lambda (x) (tag (round x))))
+  
+  'integer-package-done)
+(install-integer-package)
 
 (define (install-scheme-number-package)
   (define (tag x)
@@ -228,6 +256,10 @@
          (and (= (real-part z1) 0) (= (imag-part z1) 0))))
   (put 'equ? '(complex complex)
     equ?)
+
+  (put 'real-part '(complex)
+    (lambda (x) (real-part x))
+  )
   (put 'add '(complex complex)
        (lambda (z1 z2) 
          (tag (add-complex z1 z2))))
@@ -278,16 +310,22 @@
 (define (mul x y) (apply-generic 'mul x y))
 (define (div x y) (apply-generic 'div x y))
 (define (equ? x y) (apply-generic 'equ? x y))
+
+(define (make-integer n)
+  ((get 'make 'integer) n))
 (define (make-scheme-number n)
   ((get 'make 'scheme-number) n))
 (define (make-rational n d)
   ((get 'make 'rational) n d))
+
+(define (value n)
+  (apply-generic 'value n)
+)
+ 
 (define (numer z) 
   (apply-generic 'numer z))
 (define (denom z) 
   (apply-generic 'denom z))
-(define d (make-rational 1 3))
-(numer d)
 
 (define (make-complex-from-real-imag x y)
   ((get 'make-from-real-imag 'complex) x y))
@@ -306,5 +344,4 @@
   (apply-generic '=zero? x))
 
 (define (equ? x y) (apply-generic 'equ? x y))
-
 
