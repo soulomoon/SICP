@@ -253,3 +253,14 @@
 (display (add pol2 pol))(newline)
 (display (add pol2 pol2))(newline)
 (display (add pol0 pol0))(newline)
+
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
+; 'install_transform_done
+; 'install-polynomial-package-done
+; (polynomial x (1 2) (3 2) (3 3) (1 (polynomial x (1 2) (3 2) (3 3) (1 2))))
+; (polynomial x (0 2))
+; (polynomial x (1 4) (3 4) (3 6) (1 (polynomial x (1 2) (3 2) (3 3) (1 2) (0 2))))
+; (polynomial x (1 4) (3 4) (3 6) (1 (polynomial x (1 4) (3 4) (3 6) (1 4))))
+; (polynomial x)
+; > 
