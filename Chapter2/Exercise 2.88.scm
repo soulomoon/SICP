@@ -1,5 +1,5 @@
-; Exercise 2.87: Install =zero? for polynomials in the generic arithmetic package. This will allow adjoin-term to work for polynomials with coefficients that are themselves polynomials.
-(load "/home/soulomoon/Documents/git/SICP/Chapter2/source.scm")
+; Exercise 2.88: Extend the polynomial system to include subtraction of polynomials. (Hint: You may find it helpful to define a generic negation operation.)
+(load "C:/git/SICP/Chapter2/source.scm")
 (define (apply-generic op . args)
   (let ((type-tags (map type-tag args)))
     (let ((proc (get op type-tags)))
@@ -129,6 +129,13 @@
   (define (order term) (car term))
   (define (coeff term) (cadr term))
 
+  (define (negation-termlist termlist)
+    (define (negation-term term)
+      (make-term (order term) (negation (coeff term))))
+    (if (empty-termlist? termlist)
+      termlist
+      (adjoin-term (negation-term (first-term termlist)) (negation-termlist (rest-terms termlist)))))
+
   (define (add-terms L1 L2)
     (cond ((empty-termlist? L1) L2)
           ((empty-termlist? L2) L1)
@@ -191,7 +198,9 @@
     (if (=zero? (coeff term))
         term-list
         (cons term term-list)))
-        
+  (define (negation-poly p)
+    (make-poly (variable p) (negation-termlist (term-list p)))
+  )      
   (define (add-poly p1 p2)
     (if (same-variable? (variable p1) 
                         (variable p2))
@@ -218,9 +227,14 @@
   (define (tag p) (attach-tag 'polynomial p))
   (put '=zero? '(polynomial)
     (lambda (x) (empty-termlist? (term-list x))))
-
+  (put 'negation '(polynomial)
+    (lambda (x)
+      (tag (negation-poly x))))
   (put 'make 'term
-    make-term
+    make-term)
+  (put 'sub '(polynomial polynomial)
+    (lambda (p1 p2) 
+      (tag (add-poly p1 (negation-poly p2))))
   )
   (put 'add '(polynomial polynomial)
        (lambda (p1 p2) 
@@ -248,19 +262,18 @@
 (define pol (make-polynomial 'x (list a b c a)))
 (define d (make_term 1 pol))
 (define pol2 (make-polynomial 'x (list a b c d)))
-(display pol2)(newline)
-(display (raise (raise 2)))(newline)
-(display (add pol2 pol))(newline)
-(display (mul pol2 pol2))(newline)
-(display (add pol0 pol0))(newline)
+(display (sub pol pol2))(newline)
+(display (sub pol2 pol))(newline)
+(display (sub pol2 pol2))(newline)
+
+(display (sub 1 pol2))(newline)
 
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
 ; 'install_transform_done
 ; 'install-polynomial-package-done
-; (polynomial x (1 2) (3 2) (3 3) (1 (polynomial x (1 2) (3 2) (3 3) (1 2))))
-; (polynomial x (0 2))
-; (polynomial x (1 4) (3 4) (3 6) (1 (polynomial x (1 2) (3 2) (3 3) (1 2) (0 2))))
-; (polynomial x (4 10) (6 10) (6 15) (4 (polynomial x (1 10) (3 10) (3 15) (1 10))) (2 (polynomial x (3 10) (1 8) (0 4))) (4 (polynomial x (3 10) (1 8) (0 4))) (4 (polynomial x (3 15) (1 12) (0 6))) (2 (polynomial x (4 10) (6 10) (6 15) (4 10) (2 8) (4 8) (4 12) (2 8) (1 4) (3 4) (3 6) (1 4))))
+; (polynomial x (1 (polynomial x (1 -2) (3 -2) (3 -3) (1 -2) (0 2))))
+; (polynomial x (1 (polynomial x (1 2) (3 2) (3 3) (1 2) (0 -2))))
 ; (polynomial x)
+; (polynomial x (1 -2) (3 -2) (3 -3) (1 (polynomial x (1 -2) (3 -2) (3 -3) (1 -2))) (0 1))
 ; > 

@@ -63,8 +63,14 @@
 )
 
 (define (install-integer-package)
+  (define (negation x)
+    (- 0 x)
+  )
   (define (tag x)
     (cons 'integer x))
+  (put 'negation '(integer)
+    (lambda (x) (tag (negation x)))
+  )
   (put '=zero? '(integer)
        (lambda (x) (tag (= x 0))))
   (put 'value '(integer)
@@ -87,8 +93,14 @@
 (install-integer-package)
 
 (define (install-scheme-number-package)
+  (define (negation x)
+    (- 0 x)
+  )
   (define (tag x)
     x)
+  (put 'negation '(scheme-number)
+    (lambda (x) (tag (negation x)))
+  )
   (put '=zero? '(scheme-number)
        (lambda (x) (tag (= x 0))))
   (put 'equ? '(scheme-number scheme-number)
@@ -140,6 +152,9 @@
   )
   ;; interface to rest of the system
   (define (tag x) (attach-tag 'rational x))
+  (put 'negation '(rational)
+    (lambda (x) (tag (make-rat (negation (numer x)) (denom x))))
+  )
   (put '=zero? '(rational) rational_zero?)
 
   (put 'equ? '(rational rational)
@@ -176,6 +191,12 @@
   ;; interface to the rest of the system
   (define (tag x) 
     (attach-tag 'rectangular x))
+  (put 'negation '(rectangular)
+    (lambda (x) 
+      (tag 
+        (make-from-real-imag 
+          (negation (real-part x) 
+          (negation (imag-part x)))))))
   (put 'real-part '(rectangular) real-part)
   (put 'imag-part '(rectangular) imag-part)
   (put 'magnitude '(rectangular) magnitude)
@@ -203,6 +224,9 @@
           (atan y x)))
   ;; interface to the rest of the system
   (define (tag x) (attach-tag 'polar x))
+  (put 'negation '(polar)
+    (lambda (x) (tag (make-from-mag-ang (magnitude x) (negation (angle x)))))
+  )
   (put 'real-part '(polar) real-part)
   (put 'imag-part '(polar) imag-part)
   (put 'magnitude '(polar) magnitude)
@@ -254,6 +278,9 @@
   (put '=zero? '(complex)
        (lambda (z1) 
          (and (= (real-part z1) 0) (= (imag-part z1) 0))))
+  (put 'negation '(complex)
+    (lambda (x) (tag (negation x)))
+  )
   (put 'equ? '(complex complex)
     equ?)
 
@@ -344,4 +371,5 @@
   (apply-generic '=zero? x))
 
 (define (equ? x y) (apply-generic 'equ? x y))
+(define (negation x) (apply-generic 'negation x))
 
