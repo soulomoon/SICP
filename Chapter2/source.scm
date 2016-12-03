@@ -322,15 +322,15 @@
     (put 'zero '(complex) complex_zero?)
 )
 
-(define (apply-generic op . args)
-  (let ((type-tags (map type-tag args)))
-    (let ((proc (get op type-tags)))
-      (if proc
-          (apply proc (map contents args))
-          (error
-            "No method for these types: 
-             APPLY-GENERIC"
-            (list op type-tags))))))
+; (define (apply-generic op . args)
+;   (let ((type-tags (map type-tag args)))
+;     (let ((proc (get op type-tags)))
+;       (if proc
+;           (apply proc (map contents args))
+;           (error
+;             "No method for these types: 
+;              APPLY-GENERIC"
+;             (list op type-tags))))))
 
 (define (add . args) (apply apply-generic (cons 'add args)))
 (define (sub x y) (apply-generic 'sub x y))
@@ -373,3 +373,119 @@
 (define (equ? x y) (apply-generic 'equ? x y))
 (define (negation x) (apply-generic 'negation x))
 
+(define (apply-generic op . args)
+  (let ((type-tags (map type-tag args)))
+    (let ((proc (get op type-tags)))
+      (if proc
+          (let ((result (apply proc (map contents args))))
+              result
+          )
+          (cond 
+              ((> (length args) 2) 
+               (apply apply-generic 
+                      (cons op 
+                            (list (car args) 
+                                  (apply apply-generic 
+                                         (cons op 
+                                               (cdr args)))) )))
+              ((= (length args) 2)
+                (let ((type1 (car type-tags))
+                      (type2 (cadr type-tags))
+                      (a1 (car args))
+                      (a2 (cadr args)))
+    
+                  (let ((level1 (get-level type1 'level))
+                        (level2 (get-level type2 'level)))
+                        (cond 
+                              ((< level1 level2) 
+                                (apply-generic 
+                                  op (raise a1) a2))
+                              ((> level1 level2) 
+                                (apply-generic 
+                                  op a1 (raise a2)))
+                              (else
+                              (error 
+                                "No method for 
+                                these types"
+                                (list 
+                                op 
+                                type-tags)))))))
+              (else (error 
+               "No method for these types"
+               (list op type-tags))))))))
+
+
+(define (install_transform_package)
+  ; raise
+  (define integer->rational
+    (lambda (x) (make-rational (value x) 1))
+  )
+  (define rational->scheme-number
+    (lambda (x) (make-scheme-number (/ (numer x) (denom x))))
+  )
+  (define scheme-number->complex
+    (lambda (x) (make-complex-from-real-imag x 0))
+  )
+  (define complex->polynomial
+    (lambda (x) (make-polynomial 'x (make_sparse (make_term 0 (real-part x)))))
+  )
+  
+  ; project 
+  (define complex->scheme-number
+    (lambda (x) (make-scheme-number (real-part x)))
+  )
+  (define scheme-number->rational
+    (lambda (x) (make-rational (round x) 1))
+  )
+  (define rational->integer
+    (lambda (x) (make-integer (rational->scheme-number x)))
+  )
+
+  ; raise
+  (put-coercion 'integer 'raise
+                integer->rational)
+  (put-coercion 'scheme-number 'raise
+                scheme-number->complex)
+  (put-coercion 'rational 'raise
+                rational->scheme-number)
+  (put-coercion 'complex 'raise
+                complex->polynomial)
+
+  ; project
+  (put-coercion 'complex 'project complex->scheme-number)
+  (put-coercion 'scheme-number 'project scheme-number->rational)
+  (put-coercion 'rational 'project rational->integer)
+
+
+  (put-level 'integer 'level 1)
+  (put-level 'rational 'level 2)
+  (put-level 'scheme-number 'level 3)
+  (put-level 'complex 'level 4)
+  (put-level 'polynomial 'level 5)
+                
+'install_transform_done)
+(install_transform_package)
+
+
+
+(define (project x)
+  (let ((lower (get-coercion (type-tag x) 'project)))
+    (if lower
+        (lower x)
+        false)))
+
+(define (drop x)
+  (let ((low (project x)))
+    (if (and low (equ? (raise low) x))
+        (drop (project x))
+        x
+    )
+  )
+)
+(define (raise x)
+  (let ((raise (get-coercion (type-tag x) 'raise)))
+    (if raise
+        (raise x)
+        (error 
+               "No raise for this types"
+               (type-tag x)))))
