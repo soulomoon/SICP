@@ -201,6 +201,7 @@
               (the-empty-termlist))
         (let ((t1 (first-term L1))
               (t2 (first-term L2)))
+              ; (display L1)(newline )
           (if (> (order t2) (order t1))
               (list (the-empty-termlist) L1)
               (let ((new-c (div (coeff t1) 
@@ -215,9 +216,9 @@
   ;; internal procedures
   ;; representation of poly
   (define (make-poly variable term-list)
-    (cons variable term-list))
+    (cons variable (list term-list)))
   (define (variable p) (car p))
-  (define (term-list p) (cdr p))
+  (define (term-list p) (cadr p))
   (define (same-variable? v1 v2)
     (define (variable? x) (symbol? x))
     (and (variable? v1)
@@ -280,18 +281,43 @@
   (define (div-poly p1 p2)
     (if (same-variable? (variable p1) 
                         (variable p2))
-        (make-poly 
-        (variable p1)
-        (div-terms (term-list p1)
-                    (term-list p2)))
-        (error "Polys not in same var: 
-                div-POLY"
-              (list p1 p2))))
+        (append
+          (make-poly 
+            (variable p1)
+            (car (div-terms (term-list p1)
+                        (term-list p2))))
+          (cdr (div-terms (term-list p1)
+                      (term-list p2))))
+            (error "Polys not in same var: 
+                    div-POLY"
+                  (list p1 p2))
+          ))
+
+    (define (get_remain_list pol)
+      (let ((remain (cddr pol)))
+           (if (null? remain)
+               (list (make-term 0 0))
+               (car remain))))
+
+  (define (remainder-terms a b)
+    (let (
+      (get_remain_list_inner (lambda (termlist_remain) (cadr termlist_remain)))
+      (maxa (max_order a))
+      (maxb (max_order b)))
+      ; (display (get_remain_list_inner (div-terms a b)))(newline)
+      (if (< maxa maxb)
+          (get_remain_list_inner (div-terms b a))
+          (get_remain_list_inner (div-terms a b))
+      )
+  ))
   (define (gcd-terms a b)
     (if (empty-termlist? b)
         a
         (gcd-terms b (remainder-terms a b))))
-
+  ; (display (div-terms '((4 1) (3 -1) (2 -2) (1 2)) '((3 1) (1 -1))))(newline)
+  (define (greatest-common-divisor p1 p2)
+    (gcd-terms (term-list p1) (term-list p2))
+  )
 
   ;; interface to rest of the system
   (define (tag p) (attach-tag 'polynomial p))
@@ -309,12 +335,18 @@
   (put 'add '(polynomial polynomial)
        (lambda (p1 p2) 
          (tag (add-poly p1 p2))))
+  (put 'greatest-common-divisor '(polynomial polynomial)
+       (lambda (p1 p2) 
+         (greatest-common-divisor p1 p2)))
   (put 'mul '(polynomial polynomial)
        (lambda (p1 p2) 
          (tag (mul-poly p1 p2))))
   (put 'div '(polynomial polynomial)
        (lambda (p1 p2) 
          (tag (div-poly p1 p2))))
+  (put 'get_remain_list '(polynomial)
+       (lambda (p) 
+         (get_remain_list p)))
   (put 'make 'polynomial
        (lambda (var terms) 
          (tag (make-poly var terms))))
@@ -326,6 +358,14 @@
   ((get 'make 'term) order coeff))
 (define (make-polynomial var terms)
   ((get 'make 'polynomial) var terms))
+
+(define (get_remain_list n)
+  (apply-generic 'get_remain_list n)
+)
+
+(define (greatest-common-divisor a b)
+  (apply-generic 'greatest-common-divisor a b)
+)
 
 (define (install-rational-package)
   ;; internal procedures
@@ -394,16 +434,41 @@
   (apply-generic 'numer z))
 (define (denom z) 
   (apply-generic 'denom z))
-(define p1 (make-polynomial 'x '((2 1) (0 1))))
-(define p2 (make-polynomial 'x '((3 1) (0 1))))
-(define rf (make-rational p2 p1))
-(display (add rf rf))
+(define a (make_term 1 2))
+(define b (make_term 2 2))
+(define c (make_term 3 2))
+(define d (make_term 4 3))
 
+(define pol1 (make-polynomial 'x (list d c b a)))
+(define pol2 (make-polynomial 'x (list b)))
+(define pol3 (make-polynomial 'x (list c)))
+(display pol1)(newline)
+(display (div pol1 pol2))(newline)
+(display (div pol1 pol3))(newline)
+(display (div pol3 pol1))(newline)
+(display (div pol1 pol1))(newline)
+; (display (add (div pol1 pol3) (div pol1 pol3)))(newline)
+; (display (get_remain_list (div pol1 pol3)))(newline)
 
+(define p1 
+  (make-polynomial 
+   'x '((4 1) (3 -1) (2 -2) (1 2))))
+
+(define p2 
+  (make-polynomial 
+   'x '((3 1) (1 -1))))
+; (display p1)
+
+(display (greatest-common-divisor p1 p2))(newline )
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
 ; 'install_transform_done
 ; 'install-polynomial-package-done
 ; 'rational-package-done
-; (rational (polynomial x (5 2) (3 2) (2 2) (0 2)) polynomial x (4 1) (2 2) (0 1))
+; (polynomial x ((4 3) (3 2) (2 2) (1 2)))
+; (polynomial x ((2 3/2) (1 1) (0 1)) ((1 2)))
+; (polynomial x ((1 3/2) (0 1)) ((2 2) (1 2)))
+; (polynomial x () ((3 2)))
+; (polynomial x ((0 1)) ())
+; ((2 -1) (1 1))
 ; > 
