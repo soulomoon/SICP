@@ -1,7 +1,12 @@
-; Exercise 2.89: Define procedures that implement the term-list representation described above as appropriate for dense polynomials.
+; Exercise 2.91: A univariate polynomial can be divided by another one to produce a polynomial quotient and a polynomial remainder. For example,
+; x5−1x2−1=x3+x, remainder x−1.
+; x5−1x2−1=x3+x, remainder x−1.
+; Division can be performed via long division. That is, divide the highest-order term of the dividend by the highest-order term of the divisor. The result is the first term of the quotient. Next, multiply the result by the divisor, subtract that from the dividend, and produce the rest of the answer by recursively dividing the difference by the divisor. Stop when the order of the divisor exceeds the order of the dividend and declare the dividend to be the remainder. Also, if the dividend ever becomes zero, return zero as both quotient and remainder.
 
+; We can design a div-poly procedure on the model of add-poly and mul-poly. The procedure checks to see if the two polys have the same variable. If so, div-poly strips off the variable and passes the problem to div-terms, which performs the division operation on term lists. Div-poly finally reattaches the variable to the result supplied by div-terms. It is convenient to design div-terms to compute both the quotient and the remainder of a division. Div-terms can take two term lists as arguments and return a list of the quotient term list and the remainder term list.
+
+; Complete the following definition of div-terms by filling in the missing expressions. Use this to implement div-poly, which takes two polys as arguments and returns a list of the quotient and remainder polys.
 (load "/home/soulomoon/Documents/git/SICP/Chapter2/source.scm")
-
 (define (apply-generic op . args)
   (let ((type-tags (map type-tag args)))
     (let ((proc (get op type-tags)))
@@ -137,22 +142,9 @@
     (if (empty-termlist? termlist)
       termlist
       (adjoin-term (negation-term (first-term termlist)) (negation-termlist (rest-terms termlist)))))
-  (define (make_term_list n)
-    (if (= n -1)
-        (the-empty-termlist)
-        (cons (make_term n 0) (make_term_list (- n 1)))))
-  
-  (define (add_terms L1 L2)
-    (cond ((empty-termlist? L1) L2)
-          ((empty-termlist? L2) L1)
-          (else
-          (let ((t1 (order (first-term L1))) 
-                (t2 (order (first-term L2))))
-               (add-terms (make_term_list (max t1 t2))
-                          (add-terms L1  L2))))))
-  (define (mul_terms L1 L2)
-    (add_terms (mul-terms L1 L2) (the-empty-termlist)))
 
+  (define (sub-terms L1 L2)
+    (add-terms L1 (negation-termlist L2)))
   (define (add-terms L1 L2)
     (cond ((empty-termlist? L1) L2)
           ((empty-termlist? L2) L1)
@@ -183,9 +175,9 @@
     (if (empty-termlist? L1)
         (the-empty-termlist)
         (add-terms 
-          (mul-term-by-all-terms 
-            (first-term L1) L2)
-          (mul-terms (rest-terms L1) L2))))
+        (mul-term-by-all-terms 
+          (first-term L1) L2)
+        (mul-terms (rest-terms L1) L2))))
 
   (define (mul-term-by-all-terms t1 L)
     (if (empty-termlist? L)
@@ -198,6 +190,23 @@
           (mul-term-by-all-terms 
             t1 
             (rest-terms L))))))
+  (define (div-terms L1 L2)
+    (if (empty-termlist? L1)
+        (list (the-empty-termlist) 
+              (the-empty-termlist))
+        (let ((t1 (first-term L1))
+              (t2 (first-term L2)))
+          (if (> (order t2) (order t1))
+              (list (the-empty-termlist) L1)
+              (let ((new-c (div (coeff t1) 
+                                (coeff t2)))
+                    (new-o (- (order t1) 
+                              (order t2))))
+                (let ((rest-of-result
+                      (div-terms (sub-terms L1 (mul-term-by-all-terms (make-term new-o new-c) L2)) L2)))
+                  (list (adjoin-term (make-term new-o new-c)
+                              (car rest-of-result))
+                        (cadr rest-of-result))))))))
   ;; internal procedures
   ;; representation of poly
   (define (make-poly variable term-list)
@@ -223,7 +232,7 @@
                         (variable p2))
         (make-poly 
         (variable p1)
-        (add_terms (term-list p1)
+        (add-terms (term-list p1)
                     (term-list p2)))
         (error "Polys not in same var: 
                 ADD-POLY"
@@ -234,11 +243,24 @@
                         (variable p2))
         (make-poly 
         (variable p1)
-        (mul_terms (term-list p1)
+        (mul-terms (term-list p1)
                     (term-list p2)))
         (error "Polys not in same var: 
                 MUL-POLY"
               (list p1 p2))))
+    
+  (define (div-poly p1 p2)
+    (if (same-variable? (variable p1) 
+                        (variable p2))
+        (make-poly 
+        (variable p1)
+        (div-terms (term-list p1)
+                    (term-list p2)))
+        (error "Polys not in same var: 
+                div-POLY"
+              (list p1 p2))))
+    
+
 
   ;; interface to rest of the system
   (define (tag p) (attach-tag 'polynomial p))
@@ -259,6 +281,9 @@
   (put 'mul '(polynomial polynomial)
        (lambda (p1 p2) 
          (tag (mul-poly p1 p2))))
+  (put 'div '(polynomial polynomial)
+       (lambda (p1 p2) 
+         (tag (div-poly p1 p2))))
   (put 'make 'polynomial
        (lambda (var terms) 
          (tag (make-poly var terms))))
@@ -272,32 +297,16 @@
   ((get 'make 'polynomial) var terms))
 (define a (make_term 1 2))
 (define b (make_term 2 2))
-(define c (make_term 3 3))
-(define e (make_term 4 0))
+(define c (make_term 3 2))
+(define d (make_term 4 3))
 
-(define pol0 (make-polynomial 'x (list e)))
-(define pol (make-polynomial 'x (list c b a)))
-(define d (make_term 1 pol))
-(define pol2 (make-polynomial 'x (list e c b d)))
-(display (add pol pol2))(newline)
-(display (add pol2 pol))(newline)
-(display (add pol2 pol2))(newline)
-(display (sub pol pol2))(newline)
-(display (sub pol2 pol))(newline)
-(display (sub pol2 pol2))(newline)
-
-(display (sub 1 pol2))(newline)
-
+(define pol1 (make-polynomial 'x (list d c b a)))
+(define pol2 (make-polynomial 'x (list b)))
+(display (div pol1 pol2))(newline)
 
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
 ; 'install_transform_done
 ; 'install-polynomial-package-done
-; (polynomial x (3 6) (2 4) (1 (polynomial x (3 3) (2 2) (1 2) (0 2))) (0 0))
-; (polynomial x (3 6) (2 4) (1 (polynomial x (3 3) (2 2) (1 2) (0 2))) (0 0))
-; (polynomial x (3 6) (2 4) (1 (polynomial x (3 6) (2 4) (1 4) (0 0))) (0 0))
-; (polynomial x (1 (polynomial x (3 -3) (2 -2) (1 -2) (0 2))) (0 0))
-; (polynomial x (1 (polynomial x (3 3) (2 2) (1 2) (0 -2))) (0 0))
-; (polynomial x (1 (polynomial x (3 0) (2 0) (1 0) (0 0))) (0 0))
-; (polynomial x (3 -3) (2 -2) (1 (polynomial x (3 -3) (2 -2) (1 -2))) (0 1))
+; (polynomial x ((2 3/2) (1 1) (0 1)) ((1 2)))
 ; > 

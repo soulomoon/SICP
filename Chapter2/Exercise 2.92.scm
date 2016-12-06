@@ -1,7 +1,6 @@
-; Exercise 2.89: Define procedures that implement the term-list representation described above as appropriate for dense polynomials.
+; Exercise 2.92: By imposing an ordering on variables, extend the polynomial package so that addition and multiplication of polynomials works for polynomials in different variables. (This is not easy!)
 
 (load "/home/soulomoon/Documents/git/SICP/Chapter2/source.scm")
-
 (define (apply-generic op . args)
   (let ((type-tags (map type-tag args)))
     (let ((proc (get op type-tags)))
@@ -137,22 +136,9 @@
     (if (empty-termlist? termlist)
       termlist
       (adjoin-term (negation-term (first-term termlist)) (negation-termlist (rest-terms termlist)))))
-  (define (make_term_list n)
-    (if (= n -1)
-        (the-empty-termlist)
-        (cons (make_term n 0) (make_term_list (- n 1)))))
-  
-  (define (add_terms L1 L2)
-    (cond ((empty-termlist? L1) L2)
-          ((empty-termlist? L2) L1)
-          (else
-          (let ((t1 (order (first-term L1))) 
-                (t2 (order (first-term L2))))
-               (add-terms (make_term_list (max t1 t2))
-                          (add-terms L1  L2))))))
-  (define (mul_terms L1 L2)
-    (add_terms (mul-terms L1 L2) (the-empty-termlist)))
 
+  (define (sub-terms L1 L2)
+    (add-terms L1 (negation-termlist L2)))
   (define (add-terms L1 L2)
     (cond ((empty-termlist? L1) L2)
           ((empty-termlist? L2) L1)
@@ -192,12 +178,30 @@
         (the-empty-termlist)
         (let ((t2 (first-term L)))
           (adjoin-term
-          (make-term 
-            (+ (order t1) (order t2))
-            (mul (coeff t1) (coeff t2)))
-          (mul-term-by-all-terms 
-            t1 
-            (rest-terms L))))))
+            (make-term 
+              (+ (order t1) (order t2))
+              (mul (coeff t1) (coeff t2)))
+            (mul-term-by-all-terms 
+              t1 
+              (rest-terms L))))))
+
+  (define (div-terms L1 L2)
+    (if (empty-termlist? L1)
+        (list (the-empty-termlist) 
+              (the-empty-termlist))
+        (let ((t1 (first-term L1))
+              (t2 (first-term L2)))
+          (if (> (order t2) (order t1))
+              (list (the-empty-termlist) L1)
+              (let ((new-c (div (coeff t1) 
+                                (coeff t2)))
+                    (new-o (- (order t1) 
+                              (order t2))))
+                (let ((rest-of-result
+                      (div-terms (sub-terms L1 (mul-term-by-all-terms (make-term new-o new-c) L2)) L2)))
+                  (list (adjoin-term (make-term new-o new-c)
+                              (car rest-of-result))
+                        (cadr rest-of-result))))))))
   ;; internal procedures
   ;; representation of poly
   (define (make-poly variable term-list)
@@ -222,23 +226,59 @@
     (if (same-variable? (variable p1) 
                         (variable p2))
         (make-poly 
-        (variable p1)
-        (add_terms (term-list p1)
-                    (term-list p2)))
-        (error "Polys not in same var: 
-                ADD-POLY"
-              (list p1 p2))))
+          (variable p1)
+          (add-terms (term-list p1)
+                      (term-list p2)))
+        (contents (add_expand p1 p2))))
+  (define (max_order term_list) (apply max (map order term_list)))
+  (define (add_expand p1 p2)
+    (let (
+      (var1 (variable p1))
+      (var2 (variable p2))
+      (max1 (max_order (term-list p1)))
+      (max2 (max_order (term-list p2)))
+      (merge (lambda (lp1 lp2)
+        (let ((addent (tag lp1))
+              (adder (make-polynomial (variable lp1)
+                                          (list (make-term 0 (tag lp2))))))
+        (make-poly
+          (variable lp1)
+          (contents (add adder addent)))))))
+    (if (> max1 max2)
+          (merge p1 p2)
+          (merge p2 p1))))
+
+  (define (mul_expand p1 p2)
+    (let ((merge (lambda (lp1 lp2) 
+                         (let ((t1 (make-term 0 (tag lp1))))
+                              (cons (variable lp2) (mul-term-by-all-terms t1 (term-list lp2))))))
+          (max1 (max_order (term-list p1)))
+          (max2 (max_order (term-list p2))))
+         (if (< max1 max2)
+             (merge p1 p2)
+             (merge p2 p1))))
 
   (define (mul-poly p1 p2)
     (if (same-variable? (variable p1) 
                         (variable p2))
+        (make-poly
+          (variable p1)
+          (mul-terms (term-list p1)
+                      (term-list p2)))
+        (mul_expand p1 p2)))
+    
+  (define (div-poly p1 p2)
+    (if (same-variable? (variable p1) 
+                        (variable p2))
         (make-poly 
         (variable p1)
-        (mul_terms (term-list p1)
+        (div-terms (term-list p1)
                     (term-list p2)))
         (error "Polys not in same var: 
-                MUL-POLY"
+                div-POLY"
               (list p1 p2))))
+    
+
 
   ;; interface to rest of the system
   (define (tag p) (attach-tag 'polynomial p))
@@ -259,6 +299,9 @@
   (put 'mul '(polynomial polynomial)
        (lambda (p1 p2) 
          (tag (mul-poly p1 p2))))
+  (put 'div '(polynomial polynomial)
+       (lambda (p1 p2) 
+         (tag (div-poly p1 p2))))
   (put 'make 'polynomial
        (lambda (var terms) 
          (tag (make-poly var terms))))
@@ -270,34 +313,29 @@
   ((get 'make 'term) order coeff))
 (define (make-polynomial var terms)
   ((get 'make 'polynomial) var terms))
-(define a (make_term 1 2))
+(define o (make_term 0 33))
+(define a (make_term 1 5))
 (define b (make_term 2 2))
-(define c (make_term 3 3))
-(define e (make_term 4 0))
+(define c (make_term 3 2))
+(define d (make_term 4 3))
 
-(define pol0 (make-polynomial 'x (list e)))
-(define pol (make-polynomial 'x (list c b a)))
-(define d (make_term 1 pol))
-(define pol2 (make-polynomial 'x (list e c b d)))
-(display (add pol pol2))(newline)
-(display (add pol2 pol))(newline)
-(display (add pol2 pol2))(newline)
-(display (sub pol pol2))(newline)
-(display (sub pol2 pol))(newline)
-(display (sub pol2 pol2))(newline)
-
-(display (sub 1 pol2))(newline)
-
+(define polx (make-polynomial 'y (list d c b a o)))
+(define poly (make-polynomial 'y (list d c b a o)))
+(define polyz (make-polynomial 'x (list a )))
+(display (add polx 1))(newline)
+(display (add polx poly))(newline)
+; (display polyz)(newline)
+(display (mul 3 polyz))(newline)
+(display (mul polyz 3))(newline)
+(display (mul polx polyz))(newline)
 
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
 ; 'install_transform_done
 ; 'install-polynomial-package-done
-; (polynomial x (3 6) (2 4) (1 (polynomial x (3 3) (2 2) (1 2) (0 2))) (0 0))
-; (polynomial x (3 6) (2 4) (1 (polynomial x (3 3) (2 2) (1 2) (0 2))) (0 0))
-; (polynomial x (3 6) (2 4) (1 (polynomial x (3 6) (2 4) (1 4) (0 0))) (0 0))
-; (polynomial x (1 (polynomial x (3 -3) (2 -2) (1 -2) (0 2))) (0 0))
-; (polynomial x (1 (polynomial x (3 3) (2 2) (1 2) (0 -2))) (0 0))
-; (polynomial x (1 (polynomial x (3 0) (2 0) (1 0) (0 0))) (0 0))
-; (polynomial x (3 -3) (2 -2) (1 (polynomial x (3 -3) (2 -2) (1 -2))) (0 1))
+; (polynomial y (4 3) (3 2) (2 2) (1 5) (0 (polynomial x (0 34))))
+; (polynomial y (4 6) (3 4) (2 4) (1 10) (0 66))
+; (polynomial x (1 15))
+; (polynomial x (1 15))
+; (polynomial y (4 (polynomial x (1 15))) (3 (polynomial x (1 10))) (2 (polynomial x (1 10))) (1 (polynomial x (1 25))) (0 (polynomial x (1 165))))
 ; > 
