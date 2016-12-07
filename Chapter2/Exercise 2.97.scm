@@ -144,8 +144,14 @@
   ;; internal procedures
   (define (numer x) (car x))
   (define (denom x) (cdr x))
+  
+  (define (reduce-integers n d)
+  (let ((g (gcd n d)))
+    (list (/ n g) (/ d g))))
+
   (define (make-rat n d)
-      (cons n d))
+    (let ((reduced_list (reduce n d)))
+      (apply cons reduced_list)))
   (define (add-rat x y)
     (make-rat (add (mul (numer x) (denom y))
                  (mul (numer y) (denom x)))
@@ -180,6 +186,9 @@
   (put 'equ? '(rational rational)
     equ?
   )
+  (put 'reduce '(scheme-number scheme-number)
+       reduce-integers)
+
   (put 'add '(rational rational)
        (lambda (x y) (tag (add-rat x y))))
   (put 'sub '(rational rational)
@@ -518,7 +527,7 @@
 (define (get_remain_list n)
   (apply-generic 'get_remain_list n)
 )
-(define (reduce-polynomial a b)
+(define (reduce a b)
   (apply-generic 'reduce a b)
 )
 
@@ -530,7 +539,10 @@
 (define b (make-polynomial 'x '((0 2))))
 (display a)(newline)
 (display b)(newline)
-(display (reduce-polynomial a b))(newline)
+(display (reduce a b))(newline)
+(display (reduce 4 2))(newline)
+(display (make-rational a b))(newline)
+(display (make-rational 4 2))(newline)
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
 ; 'install_transform_done
@@ -539,4 +551,7 @@
 ; (polynomial x ((2 2) (1 2) (0 2)))
 ; (polynomial x ((0 2)))
 ; ((polynomial x ((2 1) (1 1) (0 1))) (polynomial x ((0 1))))
+; (2 1)
+; (rational (polynomial x ((2 1) (1 1) (0 1))) polynomial x ((0 1)))
+; (rational 2 . 1)
 ; > 
