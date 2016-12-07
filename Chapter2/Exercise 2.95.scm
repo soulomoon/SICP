@@ -1,15 +1,7 @@
-; Exercise 2.94: Using div-terms, implement the procedure remainder-terms and use this to define gcd-terms as above. Now write a procedure gcd-poly that computes the polynomial GCD of two polys. (The procedure should signal an error if the two polys are not in the same variable.) Install in the system a generic operation greatest-common-divisor that reduces to gcd-poly for polynomials and to ordinary gcd for ordinary numbers. As a test, try
-
-; (define p1 
-;   (make-polynomial 
-;    'x '((4 1) (3 -1) (2 -2) (1 2))))
-
-; (define p2 
-;   (make-polynomial 
-;    'x '((3 1) (1 -1))))
-
-; (greatest-common-divisor p1 p2)
-; and check your result by hand.
+; Exercise 2.95: Define P1P1, P2P2, and P3P3 to be the polynomials
+; P1:P2:P3:x2−2x+1,11x2+7,13x+5.
+; P1:x2−2x+1,P2:11x2+7,P3:13x+5.
+; Now define Q1Q1 to be the product of P1P1 and P2P2, and Q2Q2 to be the product of P1P1 and P3P3, and use greatest-common-divisor (Exercise 2.94) to compute the GCD of Q1Q1 and Q2Q2. Note that the answer is not the same as P1P1. This example introduces noninteger operations into the computation, causing difficulties with the GCD algorithm.127 To understand what is happening, try tracing gcd-terms while computing the GCD or try performing the division by hand.
 ; (load "/home/soulomoon/Documents/git/SICP/Chapter2/source.scm")
 (load "C:/git/SICP/Chapter2/source.scm")
 (define (apply-generic op . args)
@@ -317,7 +309,16 @@
         (gcd-terms b (remainder-terms a b))))
   ; (display (div-terms '((4 1) (3 -1) (2 -2) (1 2)) '((3 1) (1 -1))))(newline)
   (define (greatest-common-divisor p1 p2)
-    (gcd-terms (term-list p1) (term-list p2))
+    (let ((var1 (variable p1))
+          (var2 (variable p2)))
+          (if (same-variable? var1 var2)
+              (make-poly var1 (gcd-terms (term-list p1) (term-list p2)))
+              (error "Polys not in same var: 
+                div-POLY"
+                (list p1 p2))
+          )
+    )
+    
   )
 
   ;; interface to rest of the system
@@ -338,7 +339,7 @@
          (tag (add-poly p1 p2))))
   (put 'greatest-common-divisor '(polynomial polynomial)
        (lambda (p1 p2) 
-         (greatest-common-divisor p1 p2)))
+         (tag (greatest-common-divisor p1 p2))))
   (put 'mul '(polynomial polynomial)
        (lambda (p1 p2) 
          (tag (mul-poly p1 p2))))
@@ -435,32 +436,29 @@
   (apply-generic 'numer z))
 (define (denom z) 
   (apply-generic 'denom z))
-(define a (make_term 1 2))
-(define b (make_term 2 2))
-(define c (make_term 3 2))
-(define d (make_term 4 3))
 
-(define pol1 (make-polynomial 'x (list d c b a)))
-(define pol2 (make-polynomial 'x (list b)))
-(define pol3 (make-polynomial 'x (list c)))
-(display pol1)(newline)
-(display (div pol1 pol2))(newline)
-(display (div pol1 pol3))(newline)
-(display (div pol3 pol1))(newline)
-(display (div pol1 pol1))(newline)
-; (display (add (div pol1 pol3) (div pol1 pol3)))(newline)
-; (display (get_remain_list (div pol1 pol3)))(newline)
 
 (define p1 
   (make-polynomial 
-   'x '((4 1) (3 -1) (2 -2) (1 2))))
+   'x '((4 22))))
 
 (define p2 
   (make-polynomial 
-   'x '((3 1) (1 -1))))
-; (display p1)
+   'x '((2 11))))
 
-(display (greatest-common-divisor p1 p2))(newline )
+(define p3 
+  (make-polynomial 
+   'x '((1 13) (0 5))))
+; (display p1)
+(define Q1 (greatest-common-divisor p1 p2))
+(define Q2 (mul p1 p3))
+(define Q3 (greatest-common-divisor Q1 Q2))
+(display Q1)(newline)
+(display (mul 2 Q1))(newline)
+(display Q2)(newline)
+(display Q3)(newline)
+(display p1)(newline)
+; (display (greatest-common-divisor p1 p2))(newline )
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
 ; 'install_transform_done

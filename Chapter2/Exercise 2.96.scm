@@ -1,15 +1,7 @@
-; Exercise 2.94: Using div-terms, implement the procedure remainder-terms and use this to define gcd-terms as above. Now write a procedure gcd-poly that computes the polynomial GCD of two polys. (The procedure should signal an error if the two polys are not in the same variable.) Install in the system a generic operation greatest-common-divisor that reduces to gcd-poly for polynomials and to ordinary gcd for ordinary numbers. As a test, try
+; Exercise 2.96:
 
-; (define p1 
-;   (make-polynomial 
-;    'x '((4 1) (3 -1) (2 -2) (1 2))))
-
-; (define p2 
-;   (make-polynomial 
-;    'x '((3 1) (1 -1))))
-
-; (greatest-common-divisor p1 p2)
-; and check your result by hand.
+; Implement the procedure pseudoremainder-terms, which is just like remainder-terms except that it multiplies the dividend by the integerizing factor described above before calling div-terms. Modify gcd-terms to use pseudoremainder-terms, and verify that greatest-common-divisor now produces an answer with integer coefficients on the example in Exercise 2.95.
+; The GCD now has integer coefficients, but they are larger than those of P1P1. Modify gcd-terms so that it removes common factors from the coefficients of the answer by dividing all the coefficients by their (integer) greatest common divisor.
 ; (load "/home/soulomoon/Documents/git/SICP/Chapter2/source.scm")
 (load "C:/git/SICP/Chapter2/source.scm")
 (define (apply-generic op . args)
@@ -129,6 +121,74 @@
                "No raise for this types"
                (type-tag x)))))
 
+(define (install-rational-package)
+  ;; internal procedures
+  (define (numer x) (car x))
+  (define (denom x) (cdr x))
+  (define (make-rat n d)
+      (cons n d))
+  (define (add-rat x y)
+    (make-rat (add (mul (numer x) (denom y))
+                 (mul (numer y) (denom x)))
+              (mul (denom x) (denom y))))
+  (define (sub-rat x y)
+    (make-rat (- (mul (numer x) (denom y))
+                 (mul (numer y) (denom x)))
+              (mul (denom x) (denom y))))
+  (define (mul-rat x y)
+    (make-rat (mul (numer x) (numer y))
+              (mul (denom x) (denom y))))
+  (define (div-rat x y)
+    (make-rat (mul (numer x) (denom y))
+              (mul (denom x) (numer y))))
+
+  (define (equ? x y)
+    (if (and (= (numer x) (numer y)) (= (denom x) (denom y)))
+        true
+        false
+    )
+  )
+  (define (rational_zero? x)
+    (= 0 (numer x))
+  )
+  ;; interface to rest of the system
+  (define (tag x) (attach-tag 'rational x))
+  (put 'negation '(rational)
+    (lambda (x) (tag (make-rat (negation (numer x)) (denom x))))
+  )
+  (put '=zero? '(rational) rational_zero?)
+
+  (put 'equ? '(rational rational)
+    equ?
+  )
+  (put 'add '(rational rational)
+       (lambda (x y) (tag (add-rat x y))))
+  (put 'sub '(rational rational)
+       (lambda (x y) (tag (sub-rat x y))))
+  (put 'mul '(rational rational)
+       (lambda (x y) (tag (mul-rat x y))))
+  (put 'div '(rational rational)
+       (lambda (x y) (tag (div-rat x y))))
+  (put 'make 'rational
+       (lambda (n d) (tag (make-rat n d))))
+  (put 'numer '(rational) numer)
+  (put 'denom '(rational) denom)
+  'rational-package-done)
+(install-rational-package)
+
+      
+(define (make-rational n d)
+  ((get 'make 'rational) n d))
+
+(define (value n)
+  (apply-generic 'value n)
+)
+ 
+(define (numer z) 
+  (apply-generic 'numer z))
+(define (denom z) 
+  (apply-generic 'denom z))
+
 (define (install-polynomial-package)
 
   (define (the-empty-termlist) '())
@@ -243,6 +303,8 @@
                       (term-list p2)))
         (contents (add_expand p1 p2))))
   (define (max_order term_list) (apply max (map order term_list)))
+  
+  
   (define (add_expand p1 p2)
     (let (
       (var1 (variable p1))
@@ -311,13 +373,53 @@
           (get_remain_list_inner (div-terms a b))
       )
   ))
+  (define (max_order_coeff term_list)
+    (define (iter m rest)
+      (if (empty-termlist? rest)
+          (error "max_order_coeff fail!")
+          (let ((first_order (order (first-term rest)))
+              (first_coeff (coeff (first-term rest))))
+              (if (= first_order m)
+                  first_coeff
+                  (iter m (rest-terms rest))))))
+    (let ((max_o (max_order term_list)))
+         (iter max_o term_list)))
+  
+  (define (pseudoremainder-terms a b)
+    (let (
+      (get_remain_list_inner (lambda (termlist_remain) (cadr termlist_remain)))
+      (maxa (max_order a))
+      (maxb (max_order b))
+      (scale_factor (lambda (x maxp maxm)
+                            (let ((base (max_order_coeff x))
+                                  (power (- (+ 1 maxp) maxm)))
+                                 (make_term 0 (expt base power))))))
+      ; (display (get_remain_list_inner (div-terms a b)))(newline)
+      (if (< maxa maxb)
+          (get_remain_list_inner (div-terms (mul-term-by-all-terms (scale_factor a maxb maxa) b ) a))
+          (get_remain_list_inner (div-terms (mul-term-by-all-terms (scale_factor b maxa maxb) a ) b))
+      )
+  ))
   (define (gcd-terms a b)
     (if (empty-termlist? b)
-        a
-        (gcd-terms b (remainder-terms a b))))
+        (let ((max_coeff_divisor (apply gcd (map coeff a))))
+              (map (lambda (x) (make-term (order x) 
+                                          (div (coeff x) 
+                                              max_coeff_divisor))) 
+                   a))
+        (gcd-terms b (pseudoremainder-terms a b))))
   ; (display (div-terms '((4 1) (3 -1) (2 -2) (1 2)) '((3 1) (1 -1))))(newline)
   (define (greatest-common-divisor p1 p2)
-    (gcd-terms (term-list p1) (term-list p2))
+    (let ((var1 (variable p1))
+          (var2 (variable p2)))
+          (if (same-variable? var1 var2)
+              (make-poly var1 (gcd-terms (term-list p1) (term-list p2)))
+              (error "Polys not in same var: 
+                div-POLY"
+                (list p1 p2))
+          )
+    )
+    
   )
 
   ;; interface to rest of the system
@@ -338,7 +440,7 @@
          (tag (add-poly p1 p2))))
   (put 'greatest-common-divisor '(polynomial polynomial)
        (lambda (p1 p2) 
-         (greatest-common-divisor p1 p2)))
+         (tag (greatest-common-divisor p1 p2))))
   (put 'mul '(polynomial polynomial)
        (lambda (p1 p2) 
          (tag (mul-poly p1 p2))))
@@ -368,108 +470,35 @@
   (apply-generic 'greatest-common-divisor a b)
 )
 
-(define (install-rational-package)
-  ;; internal procedures
-  (define (numer x) (car x))
-  (define (denom x) (cdr x))
-  (define (make-rat n d)
-      (cons n d))
-  (define (add-rat x y)
-    (make-rat (add (mul (numer x) (denom y))
-                 (mul (numer y) (denom x)))
-              (mul (denom x) (denom y))))
-  (define (sub-rat x y)
-    (make-rat (- (mul (numer x) (denom y))
-                 (mul (numer y) (denom x)))
-              (mul (denom x) (denom y))))
-  (define (mul-rat x y)
-    (make-rat (mul (numer x) (numer y))
-              (mul (denom x) (denom y))))
-  (define (div-rat x y)
-    (make-rat (mul (numer x) (denom y))
-              (mul (denom x) (numer y))))
-
-  (define (equ? x y)
-    (if (and (= (numer x) (numer y)) (= (denom x) (denom y)))
-        true
-        false
-    )
-  )
-  (define (rational_zero? x)
-    (= 0 (numer x))
-  )
-  ;; interface to rest of the system
-  (define (tag x) (attach-tag 'rational x))
-  (put 'negation '(rational)
-    (lambda (x) (tag (make-rat (negation (numer x)) (denom x))))
-  )
-  (put '=zero? '(rational) rational_zero?)
-
-  (put 'equ? '(rational rational)
-    equ?
-  )
-  (put 'add '(rational rational)
-       (lambda (x y) (tag (add-rat x y))))
-  (put 'sub '(rational rational)
-       (lambda (x y) (tag (sub-rat x y))))
-  (put 'mul '(rational rational)
-       (lambda (x y) (tag (mul-rat x y))))
-  (put 'div '(rational rational)
-       (lambda (x y) (tag (div-rat x y))))
-  (put 'make 'rational
-       (lambda (n d) (tag (make-rat n d))))
-  (put 'numer '(rational) numer)
-  (put 'denom '(rational) denom)
-  'rational-package-done)
-(install-rational-package)
-
-      
-(define (make-rational n d)
-  ((get 'make 'rational) n d))
-
-(define (value n)
-  (apply-generic 'value n)
-)
- 
-(define (numer z) 
-  (apply-generic 'numer z))
-(define (denom z) 
-  (apply-generic 'denom z))
-(define a (make_term 1 2))
-(define b (make_term 2 2))
-(define c (make_term 3 2))
-(define d (make_term 4 3))
-
-(define pol1 (make-polynomial 'x (list d c b a)))
-(define pol2 (make-polynomial 'x (list b)))
-(define pol3 (make-polynomial 'x (list c)))
-(display pol1)(newline)
-(display (div pol1 pol2))(newline)
-(display (div pol1 pol3))(newline)
-(display (div pol3 pol1))(newline)
-(display (div pol1 pol1))(newline)
-; (display (add (div pol1 pol3) (div pol1 pol3)))(newline)
-; (display (get_remain_list (div pol1 pol3)))(newline)
 
 (define p1 
   (make-polynomial 
-   'x '((4 1) (3 -1) (2 -2) (1 2))))
+   'x '((2 1) (1 -2) (0 1))))
 
 (define p2 
   (make-polynomial 
-   'x '((3 1) (1 -1))))
-; (display p1)
+   'x '((2 11) (0 7))))
 
-(display (greatest-common-divisor p1 p2))(newline )
+(define p3 
+  (make-polynomial 
+   'x '((1 13) (0 5))))
+; (display p1)
+(define Q1 (mul p1 p2))
+(define Q2 (mul p1 p3))
+(define Q3 (greatest-common-divisor Q1 Q2))
+(display p1)(newline)
+(display Q2)(newline)
+(display Q2)(newline)
+(display Q3)(newline)
+(display p1)(newline)
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
 ; 'install_transform_done
-; 'install-polynomial-package-done
 ; 'rational-package-done
-; (polynomial x ((4 3) (3 2) (2 2) (1 2)))
-; (polynomial x ((2 3/2) (1 1) (0 1)) ((1 2)))
-; (polynomial x ((1 3/2) (0 1)) ((2 2) (1 2)))
-; (polynomial x () ((3 2)))
-; (polynomial x ((0 1)) ())
-; ((2 -1) (1 1))
+; 'install-polynomial-package-done
+; (polynomial x ((2 1) (1 -2) (0 1)))
+; (polynomial x ((3 13) (2 -21) (1 3) (0 5)))
+; (polynomial x ((3 13) (2 -21) (1 3) (0 5)))
+; (polynomial x ((2 1) (1 -2) (0 1)))
+; (polynomial x ((2 1) (1 -2) (0 1)))
 ; > 
