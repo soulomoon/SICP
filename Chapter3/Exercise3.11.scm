@@ -58,16 +58,28 @@ global env--> |  make-account-+          |
                                (else (error "Unknown request: 
                                              MAKE-ACCOUNT" 
                                              m))))
-                       dispatch)
-              |--------------------------|
+                       dispatch
+ 
+              +--------------------------+
 global env--> |                          |
-              |-------|------------------|
-                                      ^ 
-                                      |
-                                      |
-                               +-------------+
-                         e1->  | blance: 50  | 
-                               | withdraw   | 
-                               +---|---------+
-                                   |  
+              |      acc                 |
+              +-------|------------------+
+                      |               ^ 
+                      |               |
+                      |               |
+     (make-account 50)|        +-------------+
+                      |  e1->  | blance: 50  | 
+                      |        | withdraw    | 
+                      |        | deposit     |-------+  
+                      +--------->dispatch---------->[*] [*]---->parameters:...
+                               +-------------+                  ............
+                                   ^  
+                       (deposit 40)|
                                    |
+                                +------------+   
+                                |            |                        
+                           e2 ->| amount:40  |                        
+                                |            |                        
+                                +------------+
+                                ((acc 'deposit) 40)
+                                blance
