@@ -70,7 +70,7 @@ global env--> |                          |
      (make-account 50)|        +-------------+
                       |  e1->  | blance: 50  | 
                       |        | withdraw    | 
-                      |        | deposit     |-------+  
+                      |        | deposit     |<------+  
                       +--------->dispatch---------->[*] [*]---->parameters:...
                                +-------------+                  ............
                                    ^  
