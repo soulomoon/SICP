@@ -6,12 +6,10 @@
         (let ((subtable
                 (assoc (car key-list) (cdr table)))
               (remain-key-list (cdr key-list)))
-              
               (if subtable  
                 (if (null? remain-key-list)
                   (cdr subtable)
                   (iter remain-key-list subtable))
-              
               false)))
       (iter key-list local-table))
     
@@ -32,14 +30,12 @@
                         (cons newtable
                               (cdr table)))
                     (iter key-list table)))))
-          
           (let ((newtable (list (car key-list))))
             (begin
               (set-cdr! table
                 (list newtable))
             (iter key-list table))))
             'ok)
-
       (iter key-list local-table)
       'ok local-table)
 
