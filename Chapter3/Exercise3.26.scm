@@ -1,6 +1,63 @@
 ;Exercise 3.25: Generalizing one- and two-dimensional tables, show how to implement a table in which values are stored under an arbitrary number of keys and different values may be stored under different numbers of keys. The lookup and insert! procedures should take as input a list of keys used to access the table.
 (define (make-table)
   (let ((local-table (list '*table*)))
+    
+    (define (make_leave key value)
+      (cons 'leave (cons key value)))
+    (define (make_tree leave)
+      (cons 'tree (cons leave (cons '() '()))))
+    (define (tree? tree)
+      (eq? 'tree? (car tree)))
+
+    (define (get_leave tree)
+      (cadr tree))
+    (define (get_key tree)
+      (cadr (get_leave tree)))
+    (define (get_value tree)
+      (cddr (get_leave tree)))
+
+    (define (get_left_branch tree)
+      (caddr tree))
+    (define (get_right_branch tree)
+      (cdddr tree))
+
+    (define (connect_left_branch tree left_tree)
+      (set-car! (cddr tree)))
+    (define (connect_right_branch tree right_tree)
+      (set-cdr! (cddr tree)))
+
+    (define (lookup match_key)
+      (define (iter tree)
+        (if (tree? tree)
+            (let ((key (get_key tree))
+                  (value (get_value tree)))
+                (if (= match_key key)
+                    value
+                    (if (< match_key key)
+                      (iter (get_left_branch tree))
+                      (iter (get_right_branch tree))
+                    )
+                ))
+            false)
+      (iter local-table)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     (define (lookup key-list)
       (define (iter key-list table)
         (let ((subtable
