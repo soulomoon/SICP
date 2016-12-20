@@ -1,99 +1,55 @@
+
 ;Exercise 3.25: Generalizing one- and two-dimensional tables, show how to implement a table in which values are stored under an arbitrary number of keys and different values may be stored under different numbers of keys. The lookup and insert! procedures should take as input a list of keys used to access the table.
 (define (make-table)
   (let ((local-table (list '*table*)))
-    
     (define (make_leave key value)
-      (cons 'leave (cons key value)))
+      (cons key value))
     (define (make_tree leave)
-      (cons 'tree (cons leave (cons '() '()))))
-    (define (tree? tree)
-      (eq? 'tree? (car tree)))
-
+      (cons leave (cons '() '())))
     (define (get_leave tree)
-      (cadr tree))
+      (car tree))
     (define (get_key tree)
-      (cadr (get_leave tree)))
+      (car (get_leave tree)))
     (define (get_value tree)
-      (cddr (get_leave tree)))
-
+      (cdr (get_leave tree)))
     (define (get_left_branch tree)
-      (caddr tree))
+      (cadr tree))
     (define (get_right_branch tree)
-      (cdddr tree))
-
+      (cddr tree))
     (define (connect_left_branch tree left_tree)
-      (set-car! (cddr tree)))
+      (set-car! (cdr tree) left_tree))
     (define (connect_right_branch tree right_tree)
-      (set-cdr! (cddr tree)))
-
+      (set-cdr! (cdr tree) right_tree))
     (define (lookup match_key)
       (define (iter tree)
-        (if (tree? tree)
+        (if (null? tree)
+            false
             (let ((key (get_key tree))
                   (value (get_value tree)))
                 (if (= match_key key)
                     value
                     (if (< match_key key)
                       (iter (get_left_branch tree))
-                      (iter (get_right_branch tree))
-                    )
-                ))
-            false)
-      (iter local-table)))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    (define (lookup key-list)
-      (define (iter key-list table)
-        (let ((subtable
-                (assoc (car key-list) (cdr table)))
-              (remain-key-list (cdr key-list)))
-              (if subtable  
-                (if (null? remain-key-list)
-                  (cdr subtable)
-                  (iter remain-key-list subtable))
-              false)))
-      (iter key-list local-table))
-    
-    (define (insert! key-list value)
-      (define (iter key-list table)
-        (if (pair? (cdr table))
-          (let ((subtable 
-                  (assoc (car key-list) (cdr table)))
-                (remain-key-list (cdr key-list)))
-                (if subtable
-                  (if (null? remain-key-list)
-                    (set-cdr! subtable value)
-                    (iter remain-key-list subtable))
-
-                  (let ((newtable (list (car key-list))))
-                    (begin
-                      (set-cdr! table
-                        (cons newtable
-                              (cdr table)))
-                    (iter key-list table)))))
-          (let ((newtable (list (car key-list))))
-            (begin
-              (set-cdr! table
-                (list newtable))
-            (iter key-list table))))
-            'ok)
-      (iter key-list local-table)
+            (iter (get_right_branch tree)))))))
+      (iter (cdr local-table)))
+    (define (insert! match_key value)
+      (let ((new_tree (make_tree (make_leave match_key value))))
+        (define (iter tree)
+          (if (null? tree)
+              (set-cdr! local-table new_tree)
+              (let ((key (get_key tree))
+                    (left_tree (get_left_branch tree))
+                    (right_tree (get_right_branch tree)))
+                (if (= match_key key)
+                    (set-cdr! (get_leave tree) value)
+                    (if (< match_key key)
+                        (if (null? left_tree)
+                            (connect_left_branch tree new_tree)
+                            (iter left_tree))
+                        (if (null? right_tree)
+                            (connect_right_branch tree new_tree)
+                            (iter right_tree)))))))
+        (iter (cdr local-table)))
       'ok local-table)
 
     (define (dispatch m)
@@ -105,23 +61,31 @@
 (define operation-table (make-table))
 (define get (operation-table 'lookup-proc))
 (define put (operation-table 'insert-proc!))
-(display (put (list 'b) 0))(newline )
-(display (put (list 'a) 0))(newline )
-(display (put (list 'a 'b) 1))(newline )
-(display (put (list 'a 'b 'c) 2))(newline )
-(display (put (list 'a 'b 'd) 3))(newline )
-(display (get (list 'a 'b)))(newline )
-(display (get (list 'a 'b 'c)))(newline )
-(display (get (list 'a 'b 'd)))(newline )
+(display (put 21 0))(newline )
+(display (put 32 3))(newline )
+(display (put 12 453))(newline )
+(display (put 11 453))(newline )
+(display (put 13 453))(newline )
+(display (put 25 113))(newline )
+(display (put 33 343))(newline )
+(display (put 54 543))(newline )
+
+(get 54)
+(get 33)
+(get 123)
+
 
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
-; (*table* (b . 0))
-; (*table* (a . 0) (b . 0))
-; (*table* (a (b . 1)) (b . 0))
-; (*table* (a (b (c . 2))) (b . 0))
-; (*table* (a (b (d . 3) (c . 2))) (b . 0))
-; ((d . 3) (c . 2))
-; 2
-; 3
+; (*table* (21 . 0) ())
+; (*table* (21 . 0) () (32 . 3) ())
+; (*table* (21 . 0) ((12 . 453) ()) (32 . 3) ())
+; (*table* (21 . 0) ((12 . 453) ((11 . 453) ())) (32 . 3) ())
+; (*table* (21 . 0) ((12 . 453) ((11 . 453) ()) (13 . 453) ()) (32 . 3) ())
+; (*table* (21 . 0) ((12 . 453) ((11 . 453) ()) (13 . 453) ()) (32 . 3) ((25 . 113) ()))
+; (*table* (21 . 0) ((12 . 453) ((11 . 453) ()) (13 . 453) ()) (32 . 3) ((25 . 113) ()) (33 . 343) ())
+; (*table* (21 . 0) ((12 . 453) ((11 . 453) ()) (13 . 453) ()) (32 . 3) ((25 . 113) ()) (33 . 343) () (54 . 543) ())
+; 543
+; 343
+; #f
 ; > 
