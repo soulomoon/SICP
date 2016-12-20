@@ -92,29 +92,21 @@
 
 (define q1 (make-queue))
 
-(rear-insert-queue! q1 'a)
-(print_queue q1)
+(print_queue (rear-insert-queue! q1 'a))
 
-(rear-insert-queue! q1 'b)
-(print_queue q1)
+(print_queue (rear-insert-queue! q1 'b)) 
 
-(rear-insert-queue! q1 'c)
-(print_queue q1)
+(print_queue (rear-insert-queue! q1 'c))
 
-(front-insert-queue! q1 'd)
-(print_queue q1)
+(print_queue (front-insert-queue! q1 'd))
 
-(rear-delete-queue! q1)
-(print_queue q1)
+(print_queue (rear-delete-queue! q1))
 
-(front-delete-queue! q1)
-(print_queue q1)
+(print_queue (front-delete-queue! q1))
 
-(front-delete-queue! q1)
-(print_queue q1)
+(print_queue (front-delete-queue! q1))
 
-(front-delete-queue! q1)
-(print_queue q1)
+(print_queue (front-delete-queue! q1))
 
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
