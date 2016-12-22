@@ -1,3 +1,4 @@
+(load "/home/soulomoon/Documents/git/SICP/Chapter3/queue.scm")
 (define (call-each procedures)
   (if (null? procedures)
       'done
@@ -62,7 +63,6 @@
      (display "  New-value = ")
      (display (get-signal wire)))))
 
-(define the-agenda (make-agenda))
 
 (define (make-time-segment time queue)
   (cons time queue))
@@ -139,3 +139,84 @@
          (segment-time first-seg))
         (front-queue 
          (segment-queue first-seg)))))
+
+
+(define (and-gate a1 a2 output)
+  (define (and-action-procedure)
+    (let ((new-value
+           (logical-and (get-signal a1) 
+                        (get-signal a2))))
+         (after-delay 
+          1
+          (set-signal! output new-value))))
+  (add-action! a1 and-action-procedure)
+  (add-action! a2 and-action-procedure)
+  'ok)
+
+(define (logical-and a b)
+  (if (and (= a 1) (= b 1))
+      1
+      0))
+(define (inverter input output)
+  (define (invert-input)
+    (let ((new-value 
+           (logical-not (get-signal input))))
+         (after-delay
+          1
+          (set-signal! output new-value))))
+  (add-action! input invert-input)
+  'ok)
+
+(define (logical-not s)
+  (cond ((= s 0) 1)
+        ((= s 1) 0)
+        (else (error "Invalid signal" s))))
+
+(define (or-gate a1 a2 output)
+  (define (or-action-procedure)
+    (let ((new-value
+           (logical-or (get-signal a1) 
+                        (get-signal a2))))
+         (after-delay 
+          1
+          (set-signal! output new-value))))
+  (add-action! a1 or-action-procedure)
+  (add-action! a2 or-action-procedure)
+  'ok)
+
+(define (logical-or a b)
+  (if (or (= a 1) (= b 1))
+      1
+      0))
+(define the-agenda (make-agenda))
+
+(define a (make-wire))
+(probe 'a a)
+(define b (make-wire))
+(define c (make-wire))
+
+; (get-signal a)
+; (get-signal b)
+; (get-signal c)
+(or-gate a b c)
+(or-gate a b c)
+(get-signal c)
+(set-signal! a 1)
+(get-signal c)
+(set-signal! b 1)
+(get-signal c)
+'signal
+
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
+
+; a 0  New-value = 0'ok
+; 'ok
+; 0
+
+; a 0  New-value = 1'done
+; 1
+; 'done
+; 1
+; 'signal
+; > 
