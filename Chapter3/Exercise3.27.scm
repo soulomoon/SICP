@@ -71,6 +71,8 @@
            (else 
             (+ (memo-fib (- n 1))
                (memo-fib (- n 2)))))))) 
+;if being define as (memoize fib),firt fib would have the memoize process, and the recursive fib would be just fib.
+
 
 (define (f x) (+ x 1))
 (define (g x) (f x))
