@@ -1,6 +1,6 @@
 ; Exercise 3.33: Using primitive multiplier, adder, and constant constraints, define a procedure averager that takes three connectors a, b, and c as inputs and establishes the constraint that the value of c is the average of the values of a and b.
 
-(load "/home/soulomoon/Documents/git/SICP/Chapter3/constraint.scm")
+(load "/home/soulomoon/git/SICP/Chapter3/constraint.scm")
 (define (averager a b c)
   (let ((sum (make-connector))
         (const (make-connector)))
@@ -20,6 +20,7 @@
 
 (set-value! a 1 'user)
 (set-value! b 10 'user)
+(forget-value! a 'user)
 (forget-value! a 'user)
 (set-value! c 22 'user)
 
