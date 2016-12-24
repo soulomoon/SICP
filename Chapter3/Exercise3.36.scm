@@ -23,7 +23,7 @@
            ^
            |
         +-----------+
-        |items:false|          
+        |items:'()  |          
         +-----------+
          (cond ((null? '()  ) 'done)
           ((eq? (car   '()) 'user) 
@@ -34,9 +34,19 @@
 (define (outside value) (+ value x))
 (define x 1)
 (define (runner)
-  (define x 2)
-  (ouside 1)
-)
+(define x 2)
+(outside 1))
+(define (runner1)
+(define x 2)
+(outside x))
+
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
+; > (runner)
+; 2
+; > (runner1)
+; 3
+; > 
 
 
 
