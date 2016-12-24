@@ -1,4 +1,4 @@
-(load "/home/soulomoon/Documents/git/SICP/Chapter3/connector.scm")
+(load "/home/soulomoon/git/SICP/Chapter3/connector.scm")
 
 (define (adder a1 a2 sum)
   (define (process-new-value)

@@ -2,7 +2,7 @@
 
 ; (define (squarer a b) (multiplier a a b))
 ; There is a serious flaw in this idea. Explain.
-(load "/home/soulomoon/Documents/git/SICP/Chapter3/constraint.scm")
+(load "/home/soulomoon/git/SICP/Chapter3/constraint.scm")
 
 (define (squarer a b) (multiplier a a b))
 
@@ -13,3 +13,16 @@
 
 (squarer a b)
 (set-value! a 1 'user)
+(forget-value! a 'user)
+(set-value! b 10 'user)
+
+; Probe: a = 1
+; Probe: b = 1'done
+
+; Probe: a = ?
+; Probe: b = ?'done
+
+; Probe: b = 10'done
+; > 
+
+; as we can see, if you try to set the second moniter's value,  the first do not have enough imformation to get a root. that you have to impletment a single x in the constraint expression.
