@@ -1,0 +1,4 @@
+; Exercise 3.49: Give a scenario where the deadlock-avoidance mechanism described above does not work. (Hint: In the exchange problem, each process knows in advance which accounts it will need to get access to. Consider a situation where a process must get access to some shared resources before it can know which additional shared resources it will require.)
+
+; if you have to require the first lock, and not sure about the other lock
+; suppose you need to open a door from and get in the room the see what is the other door number, and you have to get the key in the same place. and the other on open the second door which you suppose to open after, and then need to open your door, so you went to take the your key, and found out the other door number, in the mean time the other person do the same, and you both end up tring to get other's key 

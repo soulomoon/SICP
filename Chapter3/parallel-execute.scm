@@ -1,6 +1,8 @@
 #lang racket
 (require sicp)
-
+(provide make-mutex)
+(provide test-and-set!)
+(provide make-serializer)
 (define (parallel-execute . procs)
   (map thread-wait
        (map (lambda (proc) (thread proc))
@@ -35,18 +37,18 @@
              false)))
 
 
-(define s (make-serializer))
-(define (test x) (begin (parallel-execute (lambda () (set! x (+ x 1)))
-                                          (lambda () (set! x (* x x))))
-(display x)(newline)))
+; (define s (make-serializer))
+; (define (test x) (begin (parallel-execute (lambda () (set! x (+ x 1)))
+;                                           (lambda () (set! x (* x x))))
+; (display x)(newline)))
 
-(define (loop f n)
-  (let ((x 10)) 
-    (if (= n 0)
-        false
-        (begin (set! n (- n 1)) (f x) (loop f n))
-    )
-  )
-)
+; (define (loop f n)
+;   (let ((x 10)) 
+;     (if (= n 0)
+;         false
+;         (begin (set! n (- n 1)) (f x) (loop f n))
+;     )
+;   )
+; )
 
-(loop test 100)
+; (loop test 100)
