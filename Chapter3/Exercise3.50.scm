@@ -28,7 +28,6 @@
 
 (display-stream c)
 
-
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
 

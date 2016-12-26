@@ -1,8 +1,7 @@
 ; (define (delay x) 
 ;   (lambda () x))
 
-; (define (force delayed-object)
-;   (delayed-object))
+
 
 (define (stream-car stream) 
   (car stream))
@@ -45,3 +44,5 @@
        low
        (stream-enumerate-interval (+ low 1)
                                   high))))
+
+; (display-stream (stream-enumerate-interval 10 12))
