@@ -12,12 +12,29 @@ approximately.
 1/2^k:(k, n)
 because the first is (1, 1)
 and there are not coresponding (2, 1)
-so for every (n, n) there are exceptions
+then you have to count for (n, 1)'s location
+every time step into the next, you have to in pair stage take two step
+for nth pair one step means 2^(n-1)
+(1, 1): 1
+(2, 1): 2 * 1 + 1
+(3, 1): 2 * 2 + 2 * 1 + 1
+(n ,1): 2^n - 1
+
+for (n, m)'location, take step too,
+you need two step to get to the next m, except for the second one , which you only need one step to get to
+(n, 2): 2^n - 1 + 2^(n-1)
+(n ,3): 2^n - 1 + 2^(n-1) +2^n
+(n, m): (m-1) * 2^n + 2^(n-1) -1
+
+conclude:
+(n, 1): 2^n -1
+(n, m): m * 2^n - 2^(n-1) -1
+
+
 so the total preceding pairs:
-for (1, 100): 99*2 + 1 = 197
-for (99, 100): 99*2^99 + 99
-for (100, 100): 99*2^100 + 99
-for (k, n): n*2^k + k (if k = n, you minus 1)
+for (1, 100): 100*2 - 2 - 1 = 197
+for (99, 100): 100*2^99 - 2^98 - 2
+for (100, 100):100*2^100 - 2^99 - 2
 
 
 
