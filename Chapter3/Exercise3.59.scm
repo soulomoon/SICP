@@ -45,17 +45,17 @@
     (integrate-series 
       cosine-series)))
 
-(display-stream 
-  (stream-map 
-    (lambda (n) 
-      (stream-ref sine-series n)) 
-    (stream-enumerate-interval 0 10)))
-
-(display-stream 
-  (stream-map 
-    (lambda (n) 
-      (stream-ref cosine-series n)) 
-    (stream-enumerate-interval 0 10)))
+; (display-stream 
+;   (stream-map 
+;     (lambda (n) 
+;       (stream-ref sine-series n)) 
+;     (stream-enumerate-interval 0 10)))
+; (newline )
+; (display-stream 
+;   (stream-map 
+;     (lambda (n) 
+;       (stream-ref cosine-series n)) 
+;     (stream-enumerate-interval 0 10)))
 
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
