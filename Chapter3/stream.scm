@@ -93,6 +93,9 @@
 
 (define integers 
   (cons-stream 1 (add-streams ones integers)))
+
+
+
 ; (display-stream (stream-enumerate-interval 10 12))
 (define (partial-sums s)
   (cons-stream (stream-car s) (add-streams (partial-sums s) (stream-cdr s))))
@@ -101,4 +104,4 @@
   (display-stream 
     (stream-map (lambda (n) 
                   (stream-ref s n)) 
-                    (stream-enumerate-interval 0 9))))
+                    (stream-enumerate-interval 0 10))))
