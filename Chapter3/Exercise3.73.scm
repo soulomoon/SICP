@@ -3,7 +3,36 @@
  
 ; Figure 3.33: An RC circuit and the associated signal-flow diagram.
 ; Write a procedure RC that models this circuit. RC should take as inputs the values of RR, CC, and dtdt and should return a procedure that takes as inputs a stream representing the current ii and an initial value for the capacitor voltage v0v0 and produces as output the stream of voltages vv. For example, you should be able to use RC to model an RC circuit with RR = 5 ohms, CC = 1 farad, and a 0.5-second time step by evaluating (define RC1 (RC 5 1 0.5)). This defines RC1 as a procedure that takes a stream representing the time sequence of currents and an initial capacitor voltage and produces the output stream of voltages.
+(load "/home/soulomoon/git/SICP/Chapter3/stream.scm")
+(define (RC R C dt)
+  (define (iter S v0)
+    (define (integral_iter S)
+      (let ((i (stream-car S))
+            (rest (stream-cdr S)))
+        (cons-stream
+          v0
+          (add-streams (scale-stream S (/ dt C)) 
+                       (integral_iter (stream-cdr S))))))
+    (add-streams (integral_iter S) (scale-stream S R)))
+  iter)
 
-(define (RC_transform_maker R C dt)
-  (define iter)
-  )
+
+(define RC1 (RC 5 1 0.5))
+
+(display-10 (RC1 integers 1))
+
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
+
+; 6
+; 11.5
+; 18.0
+; 25.5
+; 34.0
+; 43.5
+; 54.0
+; 65.5
+; 78.0
+; 91.5
+; 106.0'done
+; > 
