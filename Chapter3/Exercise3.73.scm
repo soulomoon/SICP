@@ -6,20 +6,40 @@
 (load "/home/soulomoon/git/SICP/Chapter3/stream.scm")
 (define (RC R C dt)
   (define (iter S v0)
-    (define (integral_iter S)
-      (let ((i (stream-car S))
-            (rest (stream-cdr S)))
+    (define (integral_iter)
+      (let ((i (stream-car S)))
         (cons-stream
           v0
-          (add-streams (scale-stream S (/ dt C)) 
-                       (integral_iter (stream-cdr S))))))
-    (add-streams (integral_iter S) (scale-stream S R)))
+          (add-streams 
+            (scale-stream S (/ dt C)) 
+            (integral_iter)))))
+    (add-streams (integral_iter) (scale-stream S R)))
   iter)
+
+(define (integral integrand initial-value dt)
+  (define int
+    (cons-stream
+     initial-value
+     (add-streams (scale-stream integrand dt)
+                  int)))
+  int)
+
+(define (RC2 R C dt)
+  (define (iter S v0)
+    (add-streams
+      (integral (scale-stream S (/ 1 C)) v0 dt)
+      (scale-stream S R)))
+  iter)
+
 
 
 (define RC1 (RC 5 1 0.5))
 
 (display-10 (RC1 integers 1))
+
+(define RC3 (RC2 5 1 0.5))
+
+(display-10 (RC3 integers 1))
 
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
