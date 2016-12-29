@@ -88,7 +88,7 @@
                   (235_divided? (cadr pair)))) 
                 (weighted-pairs integers integers 235_weight)))
 
-(display-10 ijintegers)
+; (display-10 ijintegers)
 ; (1 1)
 ; (1 2)
 ; (1 3)
@@ -102,7 +102,7 @@
 ; (2 5)'done
 ; > 
 
-(display-10 235integers)
+; (display-10 235integers)
 ; (1 2)
 ; (1 3)
 ; (2 2)
