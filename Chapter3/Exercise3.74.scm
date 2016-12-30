@@ -24,3 +24,46 @@
 ;               ⟨expression⟩))
 ; Complete the program by supplying the indicated ⟨expression⟩.
 
+(load "/home/soulomoon/git/SICP/Chapter3/stream.scm")
+
+
+
+(define a (list 1 2 1.5 1 0.5 -0.1 -2 -3 -2 -0.5 0.2 3 4))
+
+(define (trans-iterator l)
+  (if (null? l)
+    nil
+    (cons-stream (car l)
+    (trans-iterator (cdr l)))))
+
+(define sense-data (trans-iterator a))
+
+(define (sign-change-detector a b)
+  (cond 
+    ((and (> a 0) (< b 0)) 1)
+    ((and (< a 0) (> b 0)) -1)
+    (else 0)))
+
+(define zero-crossings
+  (stream-map sign-change-detector 
+              sense-data 
+              (cons-stream (stream-car sense-data) sense-data)))
+
+; (display-10 zero-crossings)
+
+
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
+
+; 0
+; 0
+; 0
+; 0
+; 0
+; -1
+; 0
+; 0
+; 0
+; 0
+; 1'done
+; > 

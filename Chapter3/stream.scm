@@ -105,3 +105,13 @@
     (stream-map (lambda (n) 
                   (stream-ref s n)) 
                     (stream-enumerate-interval 0 10))))
+
+
+
+(define (integral integrand initial-value dt)
+  (define int
+    (cons-stream
+     initial-value
+     (add-streams (scale-stream integrand dt)
+                  int)))
+  int)
