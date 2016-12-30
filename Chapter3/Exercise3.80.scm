@@ -29,16 +29,16 @@
 
 (define (RLC R C L dt)
   (define (iter vc0 il0)
-      (define diL
-        (delay (add-streams
-                (scale-stream (force iL) (/ 1 L)) 
-                (scale-stream (force vc) (* -1 (/ R L))))))
+      (define vc
+        (delay (integral dvc vc0 dt)))
       (define iL
         (delay (integral diL il0 dt)))
       (define dvc
         (delay (scale-stream (force iL) (/ -1 C))))
-      (define vc
-        (delay (integral dvc vc0 dt)))
+      (define diL
+        (delay (add-streams
+                (scale-stream (force iL) (/ 1 L))
+                (scale-stream (force vc) (* -1 (/ R L))))))
     (cons (force iL) (force vc)))
   iter)
 
