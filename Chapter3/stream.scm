@@ -115,3 +115,9 @@
      (add-streams (scale-stream integrand dt)
                   int)))
   int)
+
+  (define (list_to_stream l)
+  (if (null? l)
+    nil
+    (cons-stream (car l)
+      (list_to_stream (cdr l)))))
