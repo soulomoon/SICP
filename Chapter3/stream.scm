@@ -121,3 +121,6 @@
     nil
     (cons-stream (car l)
       (list_to_stream (cdr l)))))
+
+(define (average a b)
+  (/ (+ a b) 2))      
