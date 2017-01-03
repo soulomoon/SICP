@@ -48,18 +48,18 @@
 (put-syntax! 'or eval-or)
 
 (interpret '(and true false))
-; false
+; #f
 (interpret '(and true true))
-; true
+; #t
 (interpret '(and false false))
-; false
+; #f
 (newline)
 (interpret '(or true false))
-; true
+; #t
 (interpret '(or true true))
-; true
+; #t
 (interpret '(or false false))
-; false
+; #f
 
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
