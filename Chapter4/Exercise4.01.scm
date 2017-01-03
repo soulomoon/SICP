@@ -31,3 +31,6 @@
                     (rest-operands exps) 
                     env)))))
 
+
+(cond
+    (else 1))
