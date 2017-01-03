@@ -10,18 +10,18 @@
 (define (first-logic exp) (cadr exp))
 (define (rest-exp exp) (cons (car exp) (cddr exp)))
 ; new special forms
-(define (eval-and exp env)
-  (if (empty-logic? exp)
-      true
-      (if (true? (eval (first-logic exp) env))
-          (eval-and (rest-exp exp) env)
-          false)))
-(define (eval-or exp env)
-  (if (empty-logic? exp)
-      false
-      (if (true? (eval (first-logic exp) env))
-          true
-          (eval-or (rest-exp exp) env))))
+; (define (eval-and exp env)
+;   (if (empty-logic? exp)
+;       true
+;       (if (true? (eval# (first-logic exp) env))
+;           (eval-and (rest-exp exp) env)
+;           false)))
+; (define (eval-or exp env)
+;   (if (empty-logic? exp)
+;       false
+;       (if (true? (eval# (first-logic exp) env))
+;           true
+;           (eval-or (rest-exp exp) env))))
 
 ; derived expressions
 (define (eval-and exp env)
