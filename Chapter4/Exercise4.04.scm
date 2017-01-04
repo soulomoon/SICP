@@ -23,26 +23,45 @@
 ;           true
 ;           (eval-or (rest-exp exp) env))))
 
+; hybrid
+; (define (eval-and exp env)
+;   (if (empty-logic? exp)
+;       true
+;       (eval-if
+;           (make-if (first-logic exp)
+;                     (rest-exp exp)
+;                     'false)
+;           env)))
+
+; (define (eval-or exp env)
+;   (if (empty-logic? exp)
+;       false
+;       (eval-if
+;           (make-if (first-logic exp)
+;                     'true
+;                     (rest-exp exp))
+;           env)))
+
 ; derived expressions
 (define (eval-and exp env)
-  (if (empty-logic? exp)
-      true
-      (eval-if
-          (make-if (first-logic exp)
-                    (rest-exp exp)
-                    'false)
-          env)))
+  (eval# (and->if exp) env))
 
 (define (eval-or exp env)
+  (eval# (or->if exp) env))
+
+(define (and->if exp)
   (if (empty-logic? exp)
-      false
-      (eval-if
-          (make-if (first-logic exp)
-                    'true
-                    (rest-exp exp))
-          env)))
+      'true
+      (make-if (first-logic exp)
+                (and->if (rest-exp exp))
+                'false)))
 
-
+(define (or->if exp)
+  (if (empty-logic? exp)
+      'false
+      (make-if (first-logic exp)
+                'true
+                (or->if (rest-exp exp)))))
 
 (put-syntax! 'and eval-and) 
 (put-syntax! 'or eval-or)
