@@ -51,3 +51,8 @@
 (interpret
  '(cond ((assoc 'b '((a 1) (b 2))) => cadr) (else false)))
             
+
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
+; 2
+; > 
