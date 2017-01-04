@@ -36,22 +36,33 @@
 ; (display (let->combination exp))
   (eval# (let->combination exp) env))
 
-(define (make-let pairs body)
-  (cons 'let (cons pairs (cons body nil))))
+(define (make-let pairs . body)
+  (cons 'let (cons pairs body)))
 
 (put-syntax! 'let eval-let) 
-(let ((x 2)
-      (y 3))
-      (if x y))
+; (let ((x 2)
+;       (y 3))
+;       (if x y))
+; (interpret
+;   '(let ((x 2)
+;         (y 3))
+;         (if x y)))
+; (interpret
+;   '(let ((x 2))
+;     (let 
+;         ((y 3))
+;         (if y x))))
 
-(interpret '(let ()
-                  (if 1 1)))
-(interpret (make-let '((x 2) (y 3)) '(if x y)))
+; (interpret '(let ()
+;                   (if 1 1)))
+; (interpret (make-let '((x 2) (y 3)) '(if 1 1) '(if x y)))
 
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
 ; 'ok
 ; 3
-; (lambda (x y) (if x y))3
-; (lambda (x y) (if x y))3
+; ((lambda (x y) (if x y)) 2 3)3
+; ((lambda (x) (let ((y 3)) (if y x))) 2)((lambda (y) (if y x)) 3)2
+; (if 1 1)1
+; ((lambda (x y) (if 1 1) (if x y)) 2 3)3
 ; > 

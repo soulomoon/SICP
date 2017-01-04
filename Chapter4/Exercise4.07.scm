@@ -12,36 +12,35 @@
 (load "/home/soulomoon/git/SICP/Chapter4/Exercise4.06.scm")
 
 (define (eval-let* exp env)
-  (display (let*->nested-lets exp))
-  (eval (let*->nested-lets exp) env))
+  (display (let*->nested-lets exp))(newline )
+  (eval# (let*->nested-lets exp) env))
 
 (define (let*->nested-lets exp)
   (if (empty-pairs? exp)
-    (make-let (let*-body exp) (let*-first-pair exp))
+    (apply make-let (cons nil (let*-body exp)))
     (let ((first (let*-first-pair exp))
           (rest (let*-rest-exp exp)))
-            (make-let (list first) (let*->nested-lets rest))
-            )))
+            (make-let (list first) (let*->nested-lets rest)))))
   
 
 (define (empty-pairs? exp)
-  (display exp)(newline )
   (null? (cadr exp)))
 
 (define (let*-body exp)
   (cddr exp))
 
 (define (let*-first-pair exp)
+  ; (display exp)(newline )
   (caadr exp))
 
 (define (let*-rest-pair exp)
   (cdadr exp))
 
 (define (let*-rest-exp exp)
-  (make-let* (let*-rest-pair exp) (let*-body exp)))
+  (apply make-let* (cons (let*-rest-pair exp) (let*-body exp))))
 
-(define (make-let* pairs body)
-  (cons 'let* (cons pairs (cons body nil))))
+(define (make-let* pairs . body)
+  (cons 'let* (cons pairs body)))
 
 (put-syntax! 'let* eval-let*) 
 
@@ -55,3 +54,13 @@
         (y (+ x 2))
         (z (+ x y 5)))
     (* x z)))
+
+
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
+; 'ok
+; 'ok
+; 39
+; (let ((x 3)) (let ((y (+ x 2))) (let ((z (+ x y 5))) (let () (* x z)))))
+; 39
+; > 
