@@ -60,7 +60,7 @@
                       (sequence->exp
                         (list 
                           (sequence->exp (do-commands exp))
-                          (make-let 'iter steps)))))))
+                          (make-let  steps 'iter)))))))
                 (apply
                   make-let
                   (list 
