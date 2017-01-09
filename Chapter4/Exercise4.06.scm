@@ -33,7 +33,7 @@
           (let-arguments exp))))
 
 (define (eval-let exp env)
-; (display (let->combination exp))
+(display (let->combination exp))
   (eval# (let->combination exp) env))
 
 (define (make-let pairs . body)

@@ -36,7 +36,7 @@
   (list 'set! var arg))
 
 (define (make-let-long var pairs . body)
-  (cons 'let (cons var (cons pairs body))))
+(cons 'let (cons var (cons pairs (sequence->exp body)))))
 
 (define (make-let-whole . args)
   ; (display args)
