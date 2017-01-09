@@ -55,11 +55,6 @@
   (eval# (let->combination exp) env))
 
 
-; (begin 
-;   (define 
-;     iter 
-;       (lambda () ((if (= i 5) i (begin (set! i 0) (+ 1 i) (iter)))))) 
-;   ((if (= i 5) i (begin (set! i 0) (+ 1 i) (iter)))))
 
 
 (define (make-let pairs . body)
@@ -68,6 +63,8 @@
 (define (make-define name . body)
   (cons 'define (cons name body)))
 (put-syntax! 'let eval-let)
+
+; (interpret '(let ((i 0)) (begin (define iter (lambda () (if (= i 5) i (begin (set! i (+ i 1)) (+ 1 i) (iter))))) (if (= i 5) i (begin (set! i (+ i 1)) (+ 1 i) (iter))))))
 
 ; (interpret (make-let '((x 2) (y 3)) '(if 1 1) '(if x y)))
 

@@ -1,8 +1,6 @@
 ; Exercise 4.9: Many languages support a variety of iteration constructs, such as do, for, while, and until. In Scheme, iterative processes can be expressed in terms of ordinary procedure calls, so special iteration constructs provide no essential gain in computational power. On the other hand, such constructs are often convenient. Design some iteration constructs, give examples of their use, and show how to implement them as derived expressions.
 (load "/home/soulomoon/git/SICP/Chapter4/Exercise4.08.scm")
 
-(let ((a 'i))
-1)
 
 (define (do-bindings exp)
   (cadr exp))
@@ -47,30 +45,32 @@
 (define (do=>let exp)
   (let ((vars (do-vars exp))
         (inits (do-inits exp))
+        (steps (do-steps exp))
         (expressions (do-clause-expressions exp))
         (commands (do-commands exp)))
-        (let ((pairs (map list vars inits))
-              (body 
-                (make-let-whole
-                  'iter
-                  '()
-                  (make-if
-                    (do-clause-test exp)
-                    (sequence->exp (do-clause-expressions exp))
-                    (sequence->exp
-                      (list 
-                        (sequence->exp
-                          (map 
-                            make-assignment
-                              vars
-                              inits))
-                        (sequence->exp (do-commands exp))
-                        '(iter)))))))
-              (apply
-                make-let
-                (list 
-                  pairs
-                  body)))))
+        (let ((pairs (map list vars inits)))
+              (let
+                ((body 
+                  (make-let-whole
+                    'iter
+                    pairs
+                    (make-if
+                      (do-clause-test exp)
+                      (sequence->exp (do-clause-expressions exp))
+                      (sequence->exp
+                        (list 
+                          (sequence->exp
+                            (map 
+                              make-assignment
+                                vars
+                                steps))
+                          (sequence->exp (do-commands exp))
+                          '(iter steps)))))))
+                (apply
+                  make-let
+                  (list 
+                    pairs
+                    body))))))
 ; (do=>let )
 ; (iter () (if (= i 5) i ((set! i 0) (+ 1 i) (iter))))
 
@@ -88,7 +88,16 @@
           ((= i 5) i)
           (+ 1 i))))
 (display x)(newline)
+
+
 (interpret x)
+;   (begin 
+;   (define i 0)
+;   (define iter (lambda () (if (= i 5) i (begin (set! i (+ i 1)) (+ 1 i) (iter)))))
+;   (if (= i 5) i (begin (set! i (+ i 1)) (+ 1 i) (iter)))
+;   )
+; )
+
 
 
 ; (let
