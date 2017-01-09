@@ -39,9 +39,10 @@
   (cons 'let (cons var (cons pairs body))))
 
 (define (make-let-whole . args)
-  (symbol? (car args))
+  ; (display args)
+  (if (symbol? (car args))
     (make-let-long (car args) (cadr args) (cddr args))
-    (make-let (car args) (cddr args)))
+    (make-let (car args) (cddr args))))
 
 (define (do=>let exp)
   (let ((vars (do-vars exp))
@@ -52,7 +53,7 @@
               (body 
                 (make-let-whole
                   'iter
-                  '(())
+                  '()
                   (make-if
                     (do-clause-test exp)
                     (sequence->exp (do-clause-expressions exp))
@@ -71,7 +72,7 @@
                   pairs
                   body)))))
 ; (do=>let )
-
+; (iter () (if (= i 5) i ((set! i 0) (+ 1 i) (iter))))
 
 ; (do ((<variable1> <init1> <step1>)‌‌syntax 
 ; ...)
@@ -86,7 +87,7 @@
 (define x (do=>let '(do ((i 0 (+ i 1)))
           ((= i 5) i)
           (+ 1 i))))
-(display x)
+(display x)(newline)
 (interpret x)
 
 

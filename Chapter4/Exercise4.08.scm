@@ -50,11 +50,16 @@
 
 
 (define (eval-let exp env)
-; (display (let->combination exp))
+; (display exp)(newline)
+; (display (let->combination exp))(newline )
   (eval# (let->combination exp) env))
 
 
-
+; (begin 
+;   (define 
+;     iter 
+;       (lambda () ((if (= i 5) i (begin (set! i 0) (+ 1 i) (iter)))))) 
+;   ((if (= i 5) i (begin (set! i 0) (+ 1 i) (iter)))))
 
 
 (define (make-let pairs . body)
@@ -64,27 +69,27 @@
   (cons 'define (cons name body)))
 (put-syntax! 'let eval-let)
 
-(interpret (make-let '((x 2) (y 3)) '(if 1 1) '(if x y)))
+; (interpret (make-let '((x 2) (y 3)) '(if 1 1) '(if x y)))
 
-(interpret
-      '(let ((n 11)) 
-        (let fib-iter ((a 1) (b 0) (count n))
-          (if (= count 0)
-              b
-              (fib-iter (+ a b) 
-                        a 
-(- count 1))))))
+; (interpret
+;       '(let ((n 11)) 
+;         (let fib-iter ((a 1) (b 0) (count n))
+;           (if (= count 0)
+;               b
+;               (fib-iter (+ a b) 
+;                         a 
+; (- count 1))))))
 
-(interpret
-  '(begin
-    (define (fib n)
-      (let fib-iter ((a 1) (b 0) (count n))
-        (if (= count 0)
-            b
-            (fib-iter (+ a b) 
-                      a 
-                      (- count 1)))))
-    (fib 10)))
+; (interpret
+;   '(begin
+;     (define (fib n)
+;       (let fib-iter ((a 1) (b 0) (count n))
+;         (if (= count 0)
+;             b
+;             (fib-iter (+ a b) 
+;                       a 
+;                       (- count 1)))))
+;     (fib 10)))
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
 ; 'ok
