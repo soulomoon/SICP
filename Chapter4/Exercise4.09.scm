@@ -9,7 +9,7 @@
 (define (do-inits exp)
   (map cadr (do-bindings exp)))
 (define (do-steps exp)
-  (map caddr (do-bindings exp)))
+  (map cddr (do-bindings exp)))
 
 
 (define (do-clause exp)
@@ -59,13 +59,8 @@
                       (sequence->exp (do-clause-expressions exp))
                       (sequence->exp
                         (list 
-                          (sequence->exp
-                            (map 
-                              make-assignment
-                                vars
-                                steps))
                           (sequence->exp (do-commands exp))
-                          '(iter steps)))))))
+                          (make-let 'iter steps)))))))
                 (apply
                   make-let
                   (list 
