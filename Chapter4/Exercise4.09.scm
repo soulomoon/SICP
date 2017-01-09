@@ -1,6 +1,9 @@
 ; Exercise 4.9: Many languages support a variety of iteration constructs, such as do, for, while, and until. In Scheme, iterative processes can be expressed in terms of ordinary procedure calls, so special iteration constructs provide no essential gain in computational power. On the other hand, such constructs are often convenient. Design some iteration constructs, give examples of their use, and show how to implement them as derived expressions.
 (load "/home/soulomoon/git/SICP/Chapter4/Exercise4.08.scm")
 
+(let ((a 'i))
+1)
+
 (define (do-bindings exp)
   (cadr exp))
 (define (do-vars exp)
@@ -16,7 +19,7 @@
 (define (do-clause-test exp)
   (car (do-clause exp)))
 (define (do-clause-expressions exp)
-  (cddr (do-clause exp)))
+  (cdr (do-clause exp)))
 (define (do-commands exp)
   (cdddr exp))
 
@@ -32,14 +35,24 @@
 (define (make-assignment var arg)
   (list 'set! var arg))
 
+(define (make-let-long var pairs . body)
+  (cons 'let (cons var (cons pairs body))))
+
+(define (make-let-whole . args)
+  (symbol? (car args))
+    (make-let-long (car args) (cadr args) (cddr args))
+    (make-let (car args) (cddr args)))
+
 (define (do=>let exp)
   (let ((vars (do-vars exp))
-        (inits (do-inits exp)))
-        (let ((pairs (map cons vars inits))
+        (inits (do-inits exp))
+        (expressions (do-clause-expressions exp))
+        (commands (do-commands exp)))
+        (let ((pairs (map list vars inits))
               (body 
                 (make-let-whole
                   'iter
-                  '()
+                  '(())
                   (make-if
                     (do-clause-test exp)
                     (sequence->exp (do-clause-expressions exp))
@@ -52,13 +65,11 @@
                               inits))
                         (sequence->exp (do-commands exp))
                         '(iter)))))))
-              (display body)
               (apply
                 make-let
-                (cons 
+                (list 
                   pairs
                   body)))))
-
 ; (do=>let )
 
 
@@ -72,9 +83,11 @@
 ; )
 
 
-(do=>let '(do ((i 0 (+ i 1)))
+(define x (do=>let '(do ((i 0 (+ i 1)))
           ((= i 5) i)
-          (display i)))
+          (+ 1 i))))
+(display x)
+(interpret x)
 
 
 ; (let
