@@ -48,9 +48,18 @@
       (cons (make-lambda (let-parameters exp) (let-body exp))
             (let-arguments exp)))))
 
+
 (define (eval-let exp env)
 ; (display (let->combination exp))
   (eval# (let->combination exp) env))
+
+(define (make-let-long var pairs . body)
+  (cons 'let (cons var (cons pairs body))))
+
+(define (make-let-whole . args)
+  (symbol? (car args)
+    (make-let-long (car args) (cadr args) (cddr args))
+    (make-let (car pairs) (cddr args))))
 
 (define (make-let pairs . body)
   (cons 'let (cons pairs body)))
