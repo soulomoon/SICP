@@ -9,8 +9,7 @@
 (define (do-inits exp)
   (map cadr (do-bindings exp)))
 (define (do-steps exp)
-  (map cddr (do-bindings exp)))
-
+  (map caddr (do-bindings exp)))
 
 (define (do-clause exp)
   (caddr exp))
@@ -20,15 +19,6 @@
   (cdr (do-clause exp)))
 (define (do-commands exp)
   (cdddr exp))
-
-; (let)
-
-; (do ((vars inits steps))
-;   (test expression..)
-;   command...
-; )
-
-; (display (cons (map + '(1 2) '(3 4)) 'test))
 
 (define (make-assignment var arg)
   (list 'set! var arg))
@@ -49,80 +39,50 @@
         (expressions (do-clause-expressions exp))
         (commands (do-commands exp)))
         (let ((pairs (map list vars inits)))
-              (let
-                ((body 
-                  (make-let-whole
-                    'iter
-                    pairs
-                    (make-if
-                      (do-clause-test exp)
-                      (sequence->exp (do-clause-expressions exp))
-                      (sequence->exp
-                        (list 
-                          (sequence->exp (do-commands exp))
-                          (make-let  steps 'iter)))))))
-                (apply
-                  make-let
-                  (list 
-                    pairs
-                    body))))))
-; (do=>let )
-; (iter () (if (= i 5) i ((set! i 0) (+ 1 i) (iter))))
+              (make-let-whole
+                'iter
+                pairs
+                (make-if
+                  (do-clause-test exp)
+                  (sequence->exp expressions)
+                  (sequence->exp
+                    (list 
+                      (sequence->exp commands)
+                      (cons 'iter steps))))))))
 
 ; (do ((<variable1> <init1> <step1>)‌‌syntax 
 ; ...)
 ; (<test> <expression> ...)
 ; <command> ...)
 
-; (do ()
+(define (eval-do exp env)
+(display (do=>let exp))(newline )
+  (eval# (do=>let exp) env))
 
-; )
+(define x
+      '(do ((i 0 (+ i 1))
+            (y 0 (+ y 2)))
+        ((> (+ i y) 50) i)
+        (+ 1 i)))
 
-
-(define x (do=>let '(do ((i 0 (+ i 1)))
-          ((= i 5) i)
-          (+ 1 i))))
-(display x)(newline)
-
+(put-syntax! 'do eval-do)
 
 (interpret x)
-;   (begin 
-;   (define i 0)
-;   (define iter (lambda () (if (= i 5) i (begin (set! i (+ i 1)) (+ 1 i) (iter)))))
-;   (if (= i 5) i (begin (set! i (+ i 1)) (+ 1 i) (iter)))
-;   )
-; )
 
-
-
-; (let
-;   ((var1 init1)
-;    (var2 init2)
-;    ...)
 ;   (let iter
-;         ()
+;         (pairs)
 ;         (if test
 ;             (sequence->exp expressions)
 ;             (sequence->exp
 ;               (list
-;                 (sequence->exp
-;                   (set! var1 step1)
-;                   (set! var2 step2)
-;                   ...
-;                 )
 ;                 (sequence->exp commands)
-;                 (iter))
+;                 (iter steps))
 ;             ))))
 
-; ; (do ((var init )))
-
-
-; ; (define (eval-do exp)
-; ;   ())
-
-; (define x 1)
-; (define (fx) (+ x 1))
-
-; (define (y) 
-;   (define x 2)
-;   (fx))
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
+; 'ok
+; 'ok
+; (let iter ((i 0) (y 0)) (if (> (+ i y) 50) i (begin (+ 1 i) (iter (+ i 1) (+ y 2)))))
+; 17
+; > 
