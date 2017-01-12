@@ -53,6 +53,15 @@
   (let ((info (car variables))
         (vars (cdr variables)))
 
+
+        (define (find_in_frame var vars frame)
+          (cond
+            ((null? vars) false)
+            ((eq? var (car vars)) vars)
+            (else (find_in_frame (cdr vars)))
+          )
+        )
+
     (define (scan vars vals null_command predict_command)
       (cond ((null? vars)
              (null_command vars vals))
@@ -73,33 +82,8 @@
                  null_command 
                  predict_command)))
 
-    (define (set-variable-value! var val env)
-      (define (env-loop env)
-        (define (null_command vars vals)
-          (env-loop 
-            (enclosing-environment env)))
-        
-        )
-        (define (predict vars vals)
-        (eq? var (car vars)))
 
 
-        (define (scan vars vals)
-          (cond ((null? vars)
-                (env-loop 
-                  (enclosing-environment env)))
-                ((eq? var (car vars))
-                (set-car! vals val))
-                (else (scan (cdr vars) 
-                            (cdr vals)))))
-        (if (eq? env the-empty-environment)
-            (error "Unbound variable: SET!" var)
-            (let ((frame (first-frame env)))
-              (scan (frame-variables frame)
-                    (frame-values frame)))))
-      (env-loop env))
-
-  )
   
 
 'done)

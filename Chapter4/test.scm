@@ -83,3 +83,22 @@
     (eval (definition-value exp) env)
     env)
   'ok)
+
+
+
+(define x 1)
+(define y 1)
+(define z 1)
+(define e 1)
+
+(define a (list x y))
+
+(define b (list z e))
+
+(define k (map car (list a b)))
+
+(set-car! k 0)
+
+(display a)
+(display b)
+(display k)
