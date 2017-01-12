@@ -95,9 +95,9 @@
 
 (define b (list z e))
 
-(define k (map car (list a b)))
+(define k (cdr a))
 
-(set-car! k 0)
+(set! k 0)
 
 (display a)
 (display b)

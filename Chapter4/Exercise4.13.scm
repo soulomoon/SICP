@@ -34,6 +34,8 @@
           (find_in_frame 
             var 
             (make-frame (cdr vars) (cdr vals)))))))
+
+
 (define (env-loop-wraper f var env)
     (if (eq? env the-empty-environment)
         (error "Unbound variable" var)
@@ -70,9 +72,47 @@
               false)))
   (env-loop-wraper env-loop var env))
 
+; hack
+(define (make-unbound! var env)
+  (let ((frame (first-frame env)))
+    (define (scan oldvars oldvals vars vals)
+      (cond ((null? vars)
+             false)
+            ((eq? var (car vars))
+              (if oldvars
+                  (begin
+                    (set-cdr! oldvars (cdr vars))
+                    (set-cdr! oldvals (cdr vals)))
+                  (begin
+                    (set-car! frame (cdr vars))  
+                    (set-cdr! frame (cdr vals))  )))
+            (else (scan vars
+                        vals
+                        (cdr vars) 
+                        (cdr vals)))))
+    (scan 
+          nil
+          nil
+          (frame-variables frame)
+          (frame-values frame)
+          )))
+
+; you want a knife not a big boy
 
 
 (define variables '(1 2 3))
 (define values '(a b c))
 (define Aenvironment (list (make-frame variables values)))
 
+(define-variable! 4 'hah Aenvironment)
+(lookup-variable-value 2 Aenvironment)
+(set-variable-value! 2 'lala Aenvironment)
+(lookup-variable-value 2 Aenvironment)
+(make-unbound! 2 Aenvironment)
+(lookup-variable-value 2 Aenvironment)
+
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
+; 'b
+; 'lala
+; > 
