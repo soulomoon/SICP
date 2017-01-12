@@ -1,4 +1,4 @@
-; Exercise 4.12: The procedures define-variable!, set-variable-value! and lookup-variable-value can be expressed in terms of more abstract procedures for traversing the environment structure. Define abstractions that capture the common patterns and redefine the three procedures in terms of these abstractions.
+; Exercise 4.13: Scheme allows us to create new bindings for variables by means of define, but provides no way to get rid of bindings. Implement for the evaluator a special form make-unbound! that removes the binding of a given symbol from the environment in which the make-unbound! expression is evaluated. This problem is not completely specified. For example, should we remove only the binding in the first frame of the environment? Complete the specification and justify any choices you make.
 
 (define (enclosing-environment env) (cdr env))
 (define (first-frame env) (car env))
@@ -76,13 +76,3 @@
 (define values '(a b c))
 (define Aenvironment (list (make-frame variables values)))
 
-(define-variable! 4 'hah Aenvironment)
-(lookup-variable-value 2 Aenvironment)
-(set-variable-value! 2 'lala Aenvironment)
-(lookup-variable-value 2 Aenvironment)
-
-; Welcome to DrRacket, version 6.7 [3m].
-; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
-; 'b
-; 'lala
-; > 

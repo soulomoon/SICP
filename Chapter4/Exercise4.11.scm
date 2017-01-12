@@ -13,8 +13,10 @@
   (car frame))
 (define (rest-pairs frame)
   (cdr frame))
+
+; did a hack here
 (define (add-binding-to-frame! var val frame)
-  (set-car! frame (cons (cons var val) frame)))
+  (set-cdr! frame (cons (cons var val) (cdr frame))))
 
 
 (define (extend-environment base-env)
@@ -27,7 +29,7 @@
              (env-loop 
               (enclosing-environment env)))
             ((eq? var (car (first-pair frame)))
-              (car (first-pair frame)))  
+              (cdr (first-pair frame)))  
             (else (scan (rest-pairs frame)))))
 
     (if (eq? env the-empty-environment)
@@ -43,8 +45,8 @@
              (env-loop 
               (enclosing-environment env)))
             ((eq? var (car (first-pair frame)))
-             (set-car! (first-pair frame)))
-            (else (scan frame))))
+             (set-cdr! (first-pair frame) val))
+            (else (scan (rest-pairs frame)))))
     (if (eq? env the-empty-environment)
         (error "Unbound variable: SET!" var)
         (let ((frame (first-frame env)))
@@ -52,15 +54,15 @@
   (env-loop env))
 
 (define (define-variable! var val env)
-  (let ((frame (first-frame env)))
+  (let ((init_frame (first-frame env)))
     (define (scan frame)
       (cond ((null? frame)
              (add-binding-to-frame! 
-              var val frame))
+              var val init_frame))
             ((eq? var (car (first-pair frame)))
              (set-car! (first-pair frame) val))
-            (else (scan (rest-pair frame)))))
-    (scan frame)))
+            (else (scan (rest-pairs frame)))))
+    (scan init_frame)))
 
 
 
@@ -72,3 +74,15 @@
 
 
 (lookup-variable-value 2 Aenvironment)
+(set-variable-value! 2 'lala Aenvironment)
+(lookup-variable-value 2 Aenvironment)
+(define-variable! 4 'hah Aenvironment)
+(lookup-variable-value 4 Aenvironment)
+
+
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
+; 'b
+; 'lala
+; 'hah
+; > 
