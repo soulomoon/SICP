@@ -10,7 +10,7 @@
 ;  …
 ;  ⟨expₙ⟩)
 ; Implement a syntactic transformation let->combination that reduces evaluating let expressions to evaluating combinations of the type shown above, and add the appropriate clause to eval to handle let expressions.
-(load "/home/soulomoon/git/SICP/Chapter4/ex4.03.rkt")
+(load "/Users/soulomoon/git/SICP/Chapter4/ex4.03.rkt")
 
 (define (let-empty-pairs? exp)
   ; (display (cadr exp))

@@ -3,7 +3,7 @@
 ;                     make-frame))
 ; ;; Syntax table procedures for meta-circular evaluator
 ; (require "ex4.table.rkt")
-(load "/home/soulomoon/git/SICP/Chapter4/ex4.table.rkt")
+(load "/Users/soulomoon/git/SICP/Chapter4/ex4.table.rkt")
 ; this version of the evaluator includes these expression types:
 ;  self-evaluating 
 ;  variable

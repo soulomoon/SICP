@@ -29,15 +29,14 @@
   (define (notdefinition? exp) (not (definition? exp)))
   (define (filter l predict?)
     (let ((returns '()))
-         ((define (iter l)
-            (let ((first (car l)))
-                  (if first
-                      (if (predict? first)
-                          (begin 
-                            (set! returns (cons first returns))                   (iter (cdr l)) )
-                          (iter (cdr l)))
-                      returns)))
-          (iter l))))
+         (define (iter l)
+            (if (null? l)
+                returns
+                (if (predict? (car l))
+                    (begin 
+                      (set! returns (cons (car l) returns))                   (iter (cdr l)) )
+                    (iter (cdr l)))))
+          (iter l)))
   (define (make-the-let-body defines notdefines) 
     (if defines
         (make-the-let-body 
@@ -48,14 +47,36 @@
                   (definition-value (car defines)))
             notdefines))
         notdefines))
-  (define defines (filter body definition?))
-  (define notdefines (filter body notdefinition?))
-  
-  (make-let 
-    (map 
-      (lambda (exp) 
-              (list (definition-variable exp) '*unassigned*))
-      defines)
-    (make-the-let-body defines notdefines)))
+  (define (defines) (filter body definition?))
+  (define (notdefines) (filter body notdefinition?))
+  (display (defines))(newline )
+  (if (defines)
+      body
+      (make-let 
+        (map 
+          (lambda (exp) 
+                  (list (definition-variable exp) '*unassigned*))
+          (defines))
+          (make-the-let-body (defines) (notdefines)))))
+
+(define (make-procedure parameters body env)
+  (list 'procedure parameters (scan-out-defines body) env))
+
+
 
 ; it is better to install in the make-procedure otherwise you have to do the transformation every time the procedure is called
+(interpret 
+'(begin
+  (define (test)
+  (define b 2)
+  (define (c) 3)
+  (+ b (c)))
+(test))
+)
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
+; 'ok
+; ((define (c) 3) (define b 2))
+; ()
+; 5
+; > 
