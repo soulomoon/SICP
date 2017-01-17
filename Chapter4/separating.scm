@@ -1,5 +1,7 @@
 
 (load "/Users/soulomoon/git/SICP/Chapter4/ex4.03.rkt")
+(load "/Users/soulomoon/git/SICP/Chapter4/Exercise4.06.scm")
+
 (define (eval# exp env) ((analyze exp) env))
 
 (define (analyze exp)
@@ -109,4 +111,3 @@
                       EXECUTE-APPLICATION"
                      proc))))
 
-(interpret '(+ 1 1))

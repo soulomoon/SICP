@@ -39,7 +39,7 @@
 (define (make-let pairs . body)
   (cons 'let (cons pairs body)))
 
-(put-syntax! 'let eval-let) 
+(put-syntax! 'let eval-let)
 ; (let ((x 2)
 ;       (y 3))
 ;       (if x y))
