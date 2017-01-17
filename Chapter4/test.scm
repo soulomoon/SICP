@@ -86,19 +86,8 @@
 
 
 
-(define x 1)
-(define y 1)
-(define z 1)
-(define e 1)
 
-(define a (list x y))
-
-(define b (list z e))
-
-(define k (cdr a))
-
-(set! k 0)
-
-(display a)
-(display b)
-(display k)
+(define (x) (display 1)1)
+(define b (lambda (a) (+ (x) 1)))
+(display 'begin)(newline )
+(b 1)
