@@ -79,13 +79,18 @@
 
 (define (eval-sequence exps env)
   (cond ((last-exp? exps) (eval# (first-exp exps) env))
-        (else (eval# (first-exp exps) env)
+
+        (else 
+              ; (display (first-exp exps))
+              ; (display (eval# (first-exp exps) env))
+              (eval# (first-exp exps) env)
               (eval-sequence (rest-exps exps) env))))
 
 ; Assignments and definitions
 
 (define (eval-assignment exp env)
   (set-variable-value! (assignment-variable exp)
+                      ;  (display (assignment-value exp))
                        (eval# (assignment-value exp) env)
                        env)
   'ok)
@@ -344,7 +349,7 @@
 (define (install-syntax)
   (put-syntax! 'quote eval-quoted) 
   (put-syntax! 'define eval-definition) 
-  (put-syntax! 'set! eval-definition) 
+  (put-syntax! 'set! eval-assignment) 
   (put-syntax! 'if eval-if) 
   (put-syntax! 'lambda eval-lambda) 
   (put-syntax! 'begin eval-begin) 
