@@ -1,10 +1,10 @@
 (load "/Users/soulomoon/git/SICP/Chapter4/prompt.scm")
 
-; (define (force-it obj)
-;   (if (thunk? obj)
-;       (actual-value (thunk-exp obj) 
-;                     (thunk-env obj))
-;       obj))
+(define (force-it-without-memo obj)
+  (if (thunk? obj)
+      (actual-value (thunk-exp obj) 
+                    (thunk-env obj))
+      obj))
 (define (delay-it exp env)
   (display "delay-it--------")(display exp)(newline )
   (list 'thunk exp env))
@@ -19,6 +19,7 @@
   (cadr evaluated-thunk))
 
 (define (force-it obj)
+  ; (display "force-it---------")(display obj)(newline )
   (cond ((thunk? obj)
          (let ((result
                 (actual-value 
@@ -43,6 +44,7 @@
 
 (define (eval# exp env)
   (display "eval#-----")(display exp)(newline )
+  (define (eval-inner exp env)
   (cond ((self-evaluating? exp) exp)
         ((variable? exp) (lookup-variable-value exp env))
         ((get-syntax (type-tag exp)) ((get-syntax (type-tag exp)) exp env))
@@ -53,7 +55,12 @@
                 env))
         (else
          (error "Unknown expression type -- EVAL" exp))))
+  (let ((result (eval-inner exp env)))
+  ; (display "eval#end-----")(display result)(newline )
 
+      result
+  )
+)
 (define (actual-value exp env)
   (force-it (eval# exp env)))
 
@@ -79,6 +86,7 @@
                       type: APPLY" 
                      procedure))))
 (define (list-of-arg-values exps env)
+
   (if (no-operands? exps)
       '()
       (cons (actual-value 
@@ -138,11 +146,11 @@
 ; (driver-loop)
 
 
-(interpret
-'(begin
-(define count 0)
-(define (id x) (set! count (+ count 1)) x)
-(define w (id (id 10)))
-count
-)
-)
+; (interpret
+; '(begin
+; (define count 0)
+; (define (id x) (set! count (+ count 1)) x)
+; (define w (id (id 10)))
+; count
+; )
+; )
