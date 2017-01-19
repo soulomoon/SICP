@@ -537,6 +537,7 @@
 (define the-global-environment (setup-environment))
 
 (define (interpret exp)
+  (display (cdr exp))
   (eval# exp the-global-environment))
 
 ;; Test procedures are run from a different file using rackunit 

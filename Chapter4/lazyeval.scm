@@ -6,7 +6,7 @@
                     (thunk-env obj))
       obj))
 (define (delay-it exp env)
-  (display "delay-it--------")(display exp)(newline )
+  ; ; (display "delay-it--------")(display exp)(newline )
   (list 'thunk exp env))
 (define (thunk? obj) (tagged-list? obj 'thunk))
 (define (thunk-exp thunk) (cadr thunk))
@@ -19,15 +19,14 @@
   (cadr evaluated-thunk))
 
 (define (force-it obj)
-  ; (display "force-it---------")(display obj)(newline )
   (cond ((thunk? obj)
          (let ((result
                 (actual-value 
                  (thunk-exp obj)
                  (thunk-env obj))))
-           (display "force-it------")
-           (display (car obj))
-           (display (thunk-exp obj))(newline)
+          ;  (display "force-it------")
+          ;  (display (car obj))
+          ;  (display (thunk-exp obj))(newline)
            (set-car! obj 'evaluated-thunk)
            ;; replace exp with its value:
            (set-car! (cdr obj) result) 
@@ -43,20 +42,19 @@
 
 
 (define (eval# exp env)
-  (display "eval#-----")(display exp)(newline )
+  ; ; (display "eval#-----")(display exp)(newline )
   (define (eval-inner exp env)
   (cond ((self-evaluating? exp) exp)
         ((variable? exp) (lookup-variable-value exp env))
         ((get-syntax (type-tag exp)) ((get-syntax (type-tag exp)) exp env))
         ((application? exp)
-        ; (display "-----")
         (apply# (actual-value (operator exp) env)
                 (operands exp)
                 env))
         (else
          (error "Unknown expression type -- EVAL" exp))))
   (let ((result (eval-inner exp env)))
-  ; (display "eval#end-----")(display result)(newline )
+  ; ; (display "eval#end-----")(display result)(newline )
 
       result
   )
@@ -65,7 +63,6 @@
   (force-it (eval# exp env)))
 
 (define (apply# procedure arguments env)
-  ; (display "new")(display procedure)
   (cond ((primitive-procedure? procedure)
          (apply-primitive-procedure
           procedure
@@ -73,7 +70,6 @@
            arguments 
            env)))  ; changed
         ((compound-procedure? procedure)
-          ; (display (procedure-body procedure))
          (eval-sequence
           (procedure-body procedure)
           (extend-environment
