@@ -63,7 +63,11 @@
   (map (lambda (p a)
         (cond 
             ((symbol? p) a)
-            (else (cons (cadr p) (delay-it a env)))))
+            (else
+              (if (or (= (cadr p) 'lazy-memo) (= (cadr p) 'lazy))
+                  (cons (cadr p) (delay-it a env)))))
+                  (error "wrong variable suffix" (cadr p))
+              )
        paras args))
 
 
