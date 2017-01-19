@@ -64,10 +64,9 @@
         (cond 
             ((symbol? p) a)
             (else
-              (if (or (= (cadr p) 'lazy-memo) (= (cadr p) 'lazy))
-                  (cons (cadr p) (delay-it a env)))))
-                  (error "wrong variable suffix" (cadr p))
-              )
+              (if (or (eq? (cadr p) 'lazy-memo) (eq? (cadr p) 'lazy))
+                  (cons (cadr p) (delay-it a env))
+                  (error "wrong variable suffix" (cadr p))))))
        paras args))
 
 
