@@ -4,9 +4,9 @@
 
 (interpret
 '(begin
-(define (cons x y) (lambda (m) (m x y)))
-(define (car z) (z (lambda (p q) p)))
-(define (cdr z) (z (lambda (p q) q)))
+(define (cons x y) (list 'lazy (lambda (m) (m x y))))
+(define (car z) ((cadr z) (lambda (p q) p)))
+(define (cdr z) ((cadr z) (lambda (p q) q)))
 (define (list-ref items n)
   (if (= n 0)
       (car items)
@@ -52,6 +52,6 @@
 (put-syntax! 'quote eval-quoted) 
 
 ; (driver-loop)
-(interpret 
-''(1 2 3)
-)
+; (interpret 
+; ''(1 2 3)
+; )
