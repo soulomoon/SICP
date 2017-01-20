@@ -60,7 +60,7 @@
   )
 )
 (define (actual-value exp env)
-  (display (variable? exp))(display exp)(newline )
+  (display exp)(newline )
   (force-it (eval# exp env)))
 
 (define (apply# procedure arguments env)

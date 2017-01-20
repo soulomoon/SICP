@@ -59,20 +59,120 @@
   (tagged-list? exp 'lazy)
 )
 
-  
+; the user return a procedure
+; and you have to extract the value of the procedure. e.g. here the first one 
+; try to use the car syntax of our definition outside of evaluator require you to hack the evaluator. 
 
-(interpret '(display (cdr (cons 1 1))))
 
-(force-it (apply# (cadr (interpret (list 'cons 1 1))) '((lambda (p q) p)) the-global-environment))
-;(define a (interpret (list 'cons 1 1)))
-;(eval# (cons a '((lambda (p q) p))) (procedure-environment a))
+; it get a correct result, but when you try to use (interpret '(cons 1 1))
+; to replace 'a, it would be wrong
+; because the lookup in env for 'a would get a lambda exp back
+; but (interpret (list 'cons 1 1)) would rezult in returning a procedure, which is a evaluated lambda exp.
+(display "----------------------")(newline )(newline )
+
 (interpret
-(list 'display 
-    (list 'cdr (list 'cons 1 1))))
-
-(interpret
-'(display (car (cons 1 1)))
+'(define a (cons 1 1))
 )
+(actual-value (list 'car 'a ) 
+the-global-environment)
+
+(display "----------------------")(newline )(newline )
+
+; you could not use actual-value since procedure have to be apply inorder for the evaluator to work
+(force-it 
+  (apply# 
+  (cadr (interpret (list 'cons 1 1))) 
+  '((lambda (p q) p)) 
+  the-global-environment))
+
+(display "----------------------")(newline )(newline )
+
+; you could use actual-value since it demand for eval# inside, but it makes it more complicated to deal with since you have to work in backwerds
+(actual-value 
+  (list 
+    'car
+    (list
+      'list 
+      ''lazy
+      (make-lambda 
+        (procedure-parameters (cadr (interpret (list 'cons 1 1))))
+        (procedure-body (cadr (interpret (list 'cons 1 1)))) 
+      )
+    )
+  )
+  (procedure-environment (cadr (interpret (list 'cons 1 1)))))
 
 
-(driver-loop)
+; (driver-loop)
+
+; it is a lot harder than it seems to be, because eval# in the user input return a procedure, but you can't eval# a procedure directly.
+; you should either, use apply# or turn it back to lambda expression, in order to access it.
+; notice there are two lambda in cons, first is for inner state taking in.
+; in either case, you have to force it
+; in order to get this Exercise done you have to understand the evaluator proccess well enough to mimik its behaviour , and even working backwerds.
+
+
+; ---------------
+; tracking the exp in actual-value:
+
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
+; 'ok
+; ----------------------
+
+; cons
+; list
+; 'lazy
+; (lambda (m) (m x y))
+; 'ok
+; (car a)
+; car
+; (cadr z)
+; cadr
+; z
+; a
+; m
+; (lambda (p q) p)
+; x
+; 1
+; 1
+; ----------------------
+
+; cons
+; list
+; 'lazy
+; (lambda (m) (m x y))
+; m
+; (lambda (p q) p)
+; x
+; 1
+; 1
+; ----------------------
+
+; cons
+; list
+; 'lazy
+; (lambda (m) (m x y))
+; cons
+; list
+; 'lazy
+; (lambda (m) (m x y))
+; cons
+; list
+; 'lazy
+; (lambda (m) (m x y))
+; (car (list 'lazy (lambda (m) (m x y))))
+; car
+; (cadr z)
+; cadr
+; z
+; (list 'lazy (lambda (m) (m x y)))
+; list
+; 'lazy
+; (lambda (m) (m x y))
+; m
+; (lambda (p q) p)
+; x
+; 1
+; 1
+; > 
