@@ -25,4 +25,10 @@
     (require (= (+ (square i) (square j))
                 (square k)))
     (list i j k)))
-(print (a-pythagorean-triple-between 1 20))
+(print (amb-collect (a-pythagorean-triple-between 1 100)))
+
+
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: swindle, with debugging; memory limit: 128 MB.
+; ((3 4 5) (5 12 13) (6 8 10) (7 24 25) (8 15 17) (9 12 15) (9 40 41) (10 24 26) (11 60 61) (12 16 20) (12 35 37) (13 84 85) (14 48 50) (15 20 25) (15 36 39) (16 30 34) (16 63 65) (18 24 30) (18 80 82) (20 21 29) ...)
+; > 
