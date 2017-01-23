@@ -14,7 +14,10 @@
         ((null? (cdr items)) true)
         ((member (car items) (cdr items)) false)
         (else (distinct? (cdr items)))))
-
+(define (runtime) (current-milliseconds))
+(define (report start_time)
+  (- (runtime) start_time))
+  
 (define (multiple-dwelling)
   (let ((baker (amb 1 2 3 4 5))
         (cooper (amb 1 2 3 4 5))
