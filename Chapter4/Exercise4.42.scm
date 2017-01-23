@@ -16,6 +16,7 @@
         ((null? (cdr items)) true)
         ((member (car items) (cdr items)) false)
         (else (distinct? (cdr items)))))
+
 (define (differ) 
   (amb 
     (lambda (x y) (and (not x) y)) 
@@ -40,13 +41,15 @@
                   (require (apply (differ) statement)))
                 statement_list)
               (require (distinct? (list Betty Ethel Joan Kitty Mary)))
-              (list Betty Ethel Joan Kitty Mary)
-              )))
+              
+              (map list 
+                (list 'Betty 'Ethel 'Joan 'Kitty 'Mary)
+                (list Betty Ethel Joan Kitty Mary)))))
 
 (display (amb-collect (solve-liars)))
 
 
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: racket, with debugging; memory limit: 512 MB.
-; {(3 5 2 1 4)}
+; {((Betty 3) (Ethel 5) (Joan 2) (Kitty 1) (Mary 4))}
 ; > 
