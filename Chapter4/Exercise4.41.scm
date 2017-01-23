@@ -1,4 +1,9 @@
 ; Exercise 4.41: Write an ordinary Scheme program to solve the multiple dwelling puzzle.
+#lang racket
+(require swindle/extra)
+(require sicp)
+(require (file "/Users/soulomoon/git/SICP/Chapter4/Exercise4.40.scm"))
+
 (define (distinct? items)
   (cond ((null? items) true)
         ((null? (cdr items)) true)
@@ -11,7 +16,7 @@
         (car argslist)
         (reduce f (cdr argslist)))))
 (define (filter predicate sequence)
-  (cond ((null? sequence) nil)
+  (cond ((null? sequence) null)
         ((predicate (car sequence))
          (cons (car sequence)
                (filter predicate 
@@ -86,9 +91,37 @@
           (distinct? possible)))
        (filter-manager (car muterable-pair) all-possible)
 ))
+
+
 (display (multiple-dwelling))
+(collect-garbage)
+(define (runtime) (current-milliseconds))
+(define (report start_time)
+  (- (runtime) start_time))  
+(define (test-time n)
+  (let ((starttime 0)
+        (result 0))
+    (define (iter n)
+      (if (< n 0)
+          result
+          (begin
+            (set! starttime (runtime))
+            (amb-collect (multiple-dwelling))
+            (set! result (+ result (report starttime)))
+            (iter (- n 1)))))
+    (iter n)))
+(newline )
+(collect-garbage)
+(display (test-time 200))
+(newline)
+(collect-garbage)
+(display (test-time2 200))
+
+; it is actually faster than the nondeterministic version
 
 ; Welcome to DrRacket, version 6.7 [3m].
-; Language: SICP (PLaneT 1.18); memory limit: 512 MB.
-; ((3 2 4 5 1))
+; Language: racket, with debugging; memory limit: 512 MB.
+; {{3 2 4 5 1}}
+; 168
+; 479
 ; > 
