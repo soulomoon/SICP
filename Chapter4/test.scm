@@ -1,63 +1,50 @@
-; Exercise 4.40: In the multiple dwelling problem, how many sets of assignments are there of people to floors, both before and after the requirement that floor assignments be distinct? It is very inefficient to generate all possible assignments of people to floors and then leave it to backtracking to eliminate them. For example, most of the restrictions depend on only one or two of the person-floor variables, and can thus be imposed before floors have been selected for all the people. Write and demonstrate a much more efficient nondeterministic procedure that solves this problem based upon generating only those possibilities that are not already ruled out by previous restrictions. (Hint: This will require a nest of let expressions.)
+; Exercise 4.42: Solve the following “Liars” puzzle (from Phillips 1934):
 
-#lang swindle
-(require (file "/Users/soulomoon/git/SICP/Chapter4/Exercise4.39.scm"))
+; Five schoolgirls sat for an examination. Their parents—so they thought—showed an undue degree of interest in the result. They therefore agreed that, in writing home about the examination, each girl should make one true statement and one untrue one. The following are the relevant passages from their letters:
 
-(define (square x) (* x x))
-(define (require p)
-  (if (not p) (amb)))
-(define (an-integer-between low high)
-  (require (<= low high))
-  (amb low (an-integer-between (+ low 1) high)))
-
+; Betty: “Kitty was second in the examination. I was only third.”
+; Ethel: “You’ll be glad to hear that I was on top. Joan was second.”
+; Joan: “I was third, and poor old Ethel was bottom.”
+; Kitty: “I came out second. Mary was only fourth.”
+; Mary: “I was fourth. Top place was taken by Betty.”
+; What in fact was the order in which the five girls were placed?
+#lang racket
+(require swindle/extra)
+(require sicp)
 (define (distinct? items)
   (cond ((null? items) true)
         ((null? (cdr items)) true)
         ((member (car items) (cdr items)) false)
         (else (distinct? (cdr items)))))
+(define (require p)
+  (if (not p) (amb)))
+(define (solve-liars)
+  (let ((Betty (amb 1 2 3 4 5))
+        (Ethel (amb 1 2 3 4 5))
+        (Joan (amb 1 2 3 4 5))
+        (Kitty (amb 1 2 3 4 5))
+        (Mary (amb 1 2 3 4 5)))
+        (let ((statement_list
+                (list
+                  (amb (= 2 Kitty) (= 3 Betty))
+                  (amb (= 1 Ethel) (= 2 Joan))
+                  (amb (= 3 Joan) (= 5 Ethel))
+                  (amb (= 2 Kitty) (= 4 Mary))
+                  (amb (= 4 Mary) (= 1 Betty)))))
+              (map 
+                (lambda (statement) 
+                  (require (and (not statement) statement)))
+                statement_list)
+              (require (distinct? (list Betty Ethel Joan Kitty Mary)))
+              
+              (map list 
+                (list 'Betty 'Ethel 'Joan 'Kitty 'Mary)
+                (list Betty Ethel Joan Kitty Mary)))))
 
-(define (multiple-dwelling)
-  (let ((fletcher (amb 1 2 3 4 5)))
-    (require (not (= fletcher 5)))
-    (require (not (= fletcher 1)))
-    (let ((cooper (amb 1 2 3 4 5)))
-      (require (not (= cooper 1)))
-      (require 
-        (not (= (abs (- fletcher cooper)) 1)))
-      (let ((smith (amb 1 2 3 4 5)))
-        (require
-          (not (= (abs (- smith fletcher)) 1)))
-        (let ((baker (amb 1 2 3 4 5)))
-          (require (not (= baker 5)))
-          (let ((miller (amb 1 2 3 4 5)))
-            (require (> miller cooper))
-            (require
-              (distinct? (list baker cooper fletcher 
-                               miller smith)))
-            (list (list 'baker baker)
-                  (list 'cooper cooper)
-                  (list 'fletcher fletcher)
-                  (list 'miller miller)
-                  (list 'smith smith))))))))
-     
-;(for-each (lambda (x) (display x)(newline )) (amb-collect (multiple-dwelling)))
+(display (amb-collect (solve-liars)))
 
-(collect-garbage)
-(define (runtime) (current-milliseconds))
-(define (report start_time)
-  (- (runtime) start_time))  
-(define (test-time n)
-  (let ((starttime 0)
-        (result 0))
-    (define (iter n)
-      (if (< n 0)
-          result
-          (begin
-            (set! starttime (runtime))
-            (amb-collect (multiple-dwelling))
-            (set! result (+ result (report starttime)))
-            (iter (- n 1)))))
-    (iter n)))
-(display (test-time 200))
 
-(display (test-time1 200))
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: racket, with debugging; memory limit: 512 MB.
+; {((Betty 3) (Ethel 5) (Joan 2) (Kitty 1) (Mary 4))}
+; > 

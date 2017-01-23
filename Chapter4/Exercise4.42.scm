@@ -45,6 +45,7 @@
               (map list 
                 (list 'Betty 'Ethel 'Joan 'Kitty 'Mary)
                 (list Betty Ethel Joan Kitty Mary)))))
+                
 
 (display (amb-collect (solve-liars)))
 
@@ -53,3 +54,31 @@
 ; Language: racket, with debugging; memory limit: 512 MB.
 ; {((Betty 3) (Ethel 5) (Joan 2) (Kitty 1) (Mary 4))}
 ; > 
+
+
+; it is fun, here is even an more interesting version, but it takes a lot longer,
+; kills your cpu right at this moment.
+
+; (define (solve-liars)
+;   (let ((Betty (amb 1 2 3 4 5))
+;         (Ethel (amb 1 2 3 4 5))
+;         (Joan (amb 1 2 3 4 5))
+;         (Kitty (amb 1 2 3 4 5))
+;         (Mary (amb 1 2 3 4 5)))
+;     (define (statement_list)
+;       (list
+;        (amb (= 2 Kitty) (= 3 Betty))
+;        (amb (= 1 Ethel) (= 2 Joan))
+;        (amb (= 3 Joan) (= 5 Ethel))
+;        (amb (= 2 Kitty) (= 4 Mary))
+;        (amb (= 4 Mary) (= 1 Betty))))
+                            
+;     (map 
+;      (lambda (statement1 statement2) 
+;        (require (and statement1 (not statement2))))
+;      (statement_list) (statement_list))
+    
+;     (require (distinct? (list Betty Ethel Joan Kitty Mary)))
+;     (map list 
+;          (list 'Betty 'Ethel 'Joan 'Kitty 'Mary)
+;          (list Betty Ethel Joan Kitty Mary))))
