@@ -58,6 +58,16 @@
             (set! result (+ result (report starttime)))
             (iter (- n 1)))))
     (iter n)))
+(collect-garbage)
 (display (test-time 200))
-
+(newline)
+(collect-garbage)
 (display (test-time1 200))
+
+; the new impelementation only need 1/10 times
+
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: swindle, with debugging; memory limit: 512 MB.
+; 517
+; 4679
+; > 

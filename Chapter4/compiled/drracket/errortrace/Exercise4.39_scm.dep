@@ -1,0 +1,1 @@
+("6.7" ("725cd781fdfd37f8adac9b166b4a37f38e70f92c" . "ddfb335691fabce381ec470e5f016c554866277f") (collects #"errortrace" #"errortrace-key.rkt") (collects #"swindle" #"lang" #"reader.rkt") (collects #"swindle" #"main.rkt") (collects #"swindle" #"turbo.rkt"))

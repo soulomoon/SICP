@@ -1,7 +1,7 @@
 ; Exercise 4.39: Does the order of the restrictions in the multiple-dwelling procedure affect the answer? Does it affect the time to find an answer? If you think it matters, demonstrate a faster program obtained from the given one by reordering the restrictions. If you think it does not matter, argue your case.
 
 #lang swindle
-
+(provide test-time1)
 (define (square x) (* x x))
 (define (require p)
   (if (not p) (amb)))
@@ -14,10 +14,6 @@
         ((null? (cdr items)) true)
         ((member (car items) (cdr items)) false)
         (else (distinct? (cdr items)))))
-(define (runtime) (current-milliseconds))
-(define (report start_time)
-  (- (runtime) start_time))
-  
 (define (multiple-dwelling)
   (let ((baker (amb 1 2 3 4 5))
         (cooper (amb 1 2 3 4 5))
@@ -26,26 +22,31 @@
         (smith (amb 1 2 3 4 5)))
     ; 24/625 
     (require
-     (distinct? (list baker cooper fletcher 
-                      miller smith)))
+      (distinct? (list baker cooper fletcher 
+                       miller smith)))
     ; 1/2
     (require (> miller cooper))
     ; 1/5
-    (require (not (= baker 5)))
     (require (not (= cooper 1)))
     (require (not (= fletcher 5)))
     (require (not (= fletcher 1)))
+    (require 
+      (not (= (abs (- fletcher cooper)) 1)))
     ; 1/5
     (require
-     (not (= (abs (- smith fletcher)) 1)))
+      (not (= (abs (- smith fletcher)) 1)))
+    (require (not (= baker 5)))
     ; 1/5
-    (require 
-     (not (= (abs (- fletcher cooper)) 1)))
     (list (list 'baker baker)
           (list 'cooper cooper)
           (list 'fletcher fletcher)
           (list 'miller miller)
           (list 'smith smith))))
+(define (runtime) (current-milliseconds))
+(define (report start_time)
+  (- (runtime) start_time))
+
+(collect-garbage)  
 (define (test-time n)
   (let ((starttime 0)
         (result 0))
@@ -58,8 +59,13 @@
             (set! result (+ result (report starttime)))
             (iter (- n 1)))))
     (iter n)))
-(display (test-time 200))
+; (display (test-time 200))
+(define test-time1 test-time)
+; (module test-time1 swindle
+;   (provide test-time1)
 
+; (define test-time1 test-time)
+; )
 ; it does not effect the answer
 ; and it does effect the speed
 ; if each require take about the same time. the above would be the bestsolution
