@@ -1,8 +1,8 @@
 ; Exercise 4.48: Extend the grammar given above to handle more complex sentences. For example, you could extend noun phrases and verb phrases to include adjectives and adverbs, or you could handle compound sentences.257
 (load "/Users/soulomoon/git/SICP/Chapter4/zch4-ambeval.scm")
 
-(interpret '(define adjectives '(happy sad)))
-(interpret '(define adverbs '(happily saddly)))
+(interpret '(define adjectives '(adjective happy sad)))
+(interpret '(define adverbs '(adverb happily saddly)))
 
 (interpret '(define (require p)
   (if (not p) (amb))))
@@ -112,20 +112,20 @@
       (list 'noun-phrase
             noun-phrase
             (parse-prepositional-phrase)))))
-(maybe-extend (parse-adjective-noun-phrase))))
+(maybe-extend (parse-simple-noun-phrase))))
 
+
+(interpret '(define (parse-simple-noun-phrase)
+  (list 'simple-noun-phrase
+        (parse-word articles)
+        (parse-adjective-noun-phrase))))
 
 (interpret '(define (parse-adjective-noun-phrase)
   (amb
-    (parse-simple-noun-phrase)
+    (parse-word nouns)
     (list 'djective-noun-phrase
-          (parse-adjective)
-          (parse-noun-phrase)))))
-
-(interpret '(define (parse-adjective)
-  (list 'adjective
-        (parse-word adjectives))))
-
+          (parse-word adjectives)
+          (parse-adjective-noun-phrase)))))
 
 
 (interpret '(define (parse-verb-phrase)
@@ -142,20 +142,13 @@
   (amb
     (parse-word verbs)
     (list 'adverb-verb-phrase
-          (parse-adverb)
+          (parse-word adverbs)
           (parse-verb-phrase)))))
 
-(interpret '(define (parse-adverb)
-  (list 'adverb
-        (parse-word adverbs))))
-
-(interpret '(define (parse-simple-noun-phrase)
-  (list 'simple-noun-phrase
-        (parse-word articles)
-(parse-word nouns))))
 
 
-(interpret '(display (parse '(the professor saddly lectures to the student in the class with the cat))))
+
+(interpret '(display (parse '(the happy professor saddly lectures to the student in the class with the cat))))
 
 (try-again)
 (try-again)
