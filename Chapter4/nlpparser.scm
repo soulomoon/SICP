@@ -28,17 +28,15 @@
     (set! *unparsed* (cdr *unparsed*))
 (list (car word-list) found-word))))
 
-
+(interpret '(define (parse-sentence)
+  (list 'sentence
+         (parse-noun-phrase)
+         (parse-verb-phrase))))
 
 (interpret '(define (parse-prepositional-phrase)
   (list 'prep-phrase
         (parse-word prepositions)
-(parse-noun-phrase))))
-
-(interpret '(define (parse-sentence)
-  (list 'sentence
-         (parse-noun-phrase)
-(parse-verb-phrase))))
+        (parse-noun-phrase))))
 
 (interpret '(define (parse-verb-phrase)
   (define (maybe-extend verb-phrase)
@@ -50,11 +48,6 @@
             (parse-prepositional-phrase)))))
 (maybe-extend (parse-word verbs))))
 
-(interpret '(define (parse-simple-noun-phrase)
-  (list 'simple-noun-phrase
-        (parse-word articles)
-(parse-word nouns))))
-
 (interpret '(define (parse-noun-phrase)
   (define (maybe-extend noun-phrase)
     (amb 
@@ -65,6 +58,11 @@
             (parse-prepositional-phrase)))))
 (maybe-extend (parse-simple-noun-phrase))))
 
+(interpret '(define (parse-simple-noun-phrase)
+  (list 'simple-noun-phrase
+        (parse-word articles)
+(parse-word nouns))))
+
 (interpret '(define *unparsed* '()))
 
 (interpret '(define (parse input)
@@ -73,39 +71,6 @@
     (require (null? *unparsed*))
     sent)))
 
-(define (driver-loop )
-  (define (internal-loop try-again)
-    (prompt-for-input input-prompt)
-    (let ((input (read)))
-      (if (eq? input 'try-again)
-          (try-again)
-          (begin
-            (newline)
-            (display 
-             ";;; Starting a new problem ")
-            (ambeval 
-             input
-             the-global-environment
-             ;; ambeval success
-             (lambda (val next-alternative)
-               (announce-output 
-                output-prompt)
-               (user-print val)
-               (internal-loop 
-                next-alternative))
-             ;; ambeval failure
-             (lambda ()
-               (announce-output
-                ";;; There are no 
-                 more values of")
-               (user-print input)
-               (driver-loop)))))))
-  (internal-loop
-   (lambda ()
-     (newline)
-     (display 
-      ";;; There is no current problem")
-     (driver-loop))))
 
 (define (make-interpret)
   (let ((try false))
@@ -131,10 +96,11 @@
 )
 (define interpret (make-interpret))
 
+(define (try-again) (newline )(interpret 'try-again))
 ; (driver-loop)
-(interpret '(display (parse '(the professor lectures to the student in the class with the cat))))
-(newline )
-(interpret 'try-again)
+; (interpret '(display (parse '(the professor lectures to the student in the class with the cat))))
+; (newline )
+; (interpret 'try-again)
 ; (display (parse '(the cat eats)))
 
 ; (display (parse '(the professor lectures to 
