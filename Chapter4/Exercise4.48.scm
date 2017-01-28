@@ -143,7 +143,7 @@
     (parse-word verbs)
     (list 'adverb-verb-phrase
           (parse-word adverbs)
-          (parse-verb-phrase)))))
+          (parse-adverb-verb-phrase)))))
 
 
 
