@@ -65,6 +65,7 @@
 (interpret '(ramb 1 2))
 (interpret '(ramb 1 2))
 
+; it help because the first setences it generate won't always have the first noun, verb , and so on in each wordlist
 
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 2048 MB.
