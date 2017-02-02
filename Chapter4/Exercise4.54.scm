@@ -119,7 +119,7 @@
           (list 'fletcher fletcher)
           (list 'miller miller)
           (list 'smith smith))))
-(display (multiple-dwelling))
+(display (multiple-dwelling))))
 
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 2048 MB.
@@ -129,7 +129,3 @@
 ; > 
 
 
-
-)
-
-)
