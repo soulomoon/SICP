@@ -24,10 +24,7 @@
 
 (load "/Users/soulomoon/git/SICP/Chapter4/nlpparser.scm")
 
-(interpret '(define (an-element-of items)
-              (require (not (null? items)))
-              (amb (car items) 
-                   (an-element-of (cdr items)))))
+
 ; using the if instead of writing my own, i am lazy.
 (define (analyze-if-fail exp)
   (let ((pproc (analyze (if-predicate exp)))
@@ -57,21 +54,25 @@
         (else
          (error "Unknown expression type -- ANALYZE" exp))))
 
-(interpret
- '(define (even? n)
-    (= 0 (remainder n 2))))
-(interpret 
- '(if-fail 
-   (let ((x (an-element-of '(1 3 5))))
-     (require (even? x))
-     x)
-   'all-odd))
-(interpret 
- '(if-fail
-   (let ((x (an-element-of '(1 3 5 8))))
-     (require (even? x))
-     x)
-   'all-odd))
+; (interpret '(define (an-element-of items)
+;               (require (not (null? items)))
+;               (amb (car items) 
+;                    (an-element-of (cdr items)))))
+; (interpret
+;  '(define (even? n)
+;     (= 0 (remainder n 2))))
+; (interpret 
+;  '(if-fail 
+;    (let ((x (an-element-of '(1 3 5))))
+;      (require (even? x))
+;      x)
+;    'all-odd))
+; (interpret 
+;  '(if-fail
+;    (let ((x (an-element-of '(1 3 5 8))))
+;      (require (even? x))
+;      x)
+;    'all-odd))
 
 
 ; Welcome to DrRacket, version 6.7 [3m].
