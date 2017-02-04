@@ -45,8 +45,8 @@
 
 ; 3
 '(and 
-  [meeting ?div ?t]
-  [meeting-time (Hacker Alyssa P) ?t]
+  [meeting ?div (Wednesday ?am)]
+  [meeting-time (Hacker Alyssa P) (Wednesday ?am)]
   )
 )
 
@@ -64,7 +64,9 @@
 ; Assertion added to data base.
 
 ; (meeting-time (Hacker Alyssa P) (Wednesday 3pm))
+; (meeting-time (Hacker Alyssa P) (Wednesday 4pm))
 
 
+; (and (meeting whole-company (Wednesday 4pm)) (meeting-time (Hacker Alyssa P) (Wednesday 4pm)))
 ; (and (meeting computer (Wednesday 3pm)) (meeting-time (Hacker Alyssa P) (Wednesday 3pm)))
 ; > 
