@@ -34,7 +34,10 @@
   (rule (meeting-time ?person ?day-and-time)
         (and 
           [job ?person (?div . ?x)]
-          [meeting ?div ?day-and-time]
+          (or 
+            [meeting ?div ?day-and-time]
+            [meeting whole-company ?day-and-time]
+          )
         ))
         )
 
