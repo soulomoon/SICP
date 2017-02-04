@@ -1,8 +1,8 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-    "editor.wrappingColumn": 80,
-    "editor.wordWrap": true,
-    "editor.formatOnType": true,
+    // "editor.wrappingColumn": -1,
+    // "editor.wordWrap": false,
+    // "editor.formatOnType": true,
     "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?",
     "editor.tabSize": 2
 }
