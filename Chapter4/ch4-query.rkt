@@ -652,4 +652,7 @@
              (qeval q (singleton-stream '()))))))))
 (setup-data-base)
 
+(define (iqe . queries)
+  (for-each iq queries)
+)
 ; (iq '(supervisor ?name (Bitdiddle Ben)))
