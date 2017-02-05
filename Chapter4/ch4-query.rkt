@@ -661,6 +661,7 @@
 )
 
 (define (inssert_to_init rule_list)
-  (for-each (lambda (rule) (set! microshaft-data-base (cons rule microshaft-data-base))) rule_list))
+  (for-each (lambda (rule) (set! microshaft-data-base (cons rule microshaft-data-base))) rule_list)
+  (setup-data-base))
 
 ; (iq '(supervisor ?name (Bitdiddle Ben)))

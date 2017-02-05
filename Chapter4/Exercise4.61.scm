@@ -14,14 +14,14 @@
 ; That I have to put the rule in setup in order for it to work
 
 (define (inssert_to_init rule_list)
-  (for-each (lambda (rule) (set! microshaft-data-base (cons rule microshaft-data-base))) rule_list))
+  (for-each (lambda (rule) (set! microshaft-data-base (cons rule microshaft-data-base))) rule_list)
+  (setup-data-base))
 
 (inssert_to_init '(
   (rule (?x next-to ?y in (?x ?y . ?u)))
   (rule (?x next-to ?y in (?v . ?z))
     (?x next-to ?y in ?z))
 ))
-(setup-data-base)
 
 (inqu'(
 
