@@ -655,4 +655,12 @@
 (define (iqe . queries)
   (for-each iq queries)
 )
+
+(define (inqu queries)
+  (for-each iq queries)
+)
+
+(define (inssert_to_init rule_list)
+  (for-each (lambda (rule) (set! microshaft-data-base (cons rule microshaft-data-base))) rule_list))
+
 ; (iq '(supervisor ?name (Bitdiddle Ben)))
