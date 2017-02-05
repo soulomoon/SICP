@@ -22,16 +22,24 @@
         (and (same ?a (?a1 . ?a2))
              (last-grandson? ?a2))))
 
+; this one look nicer , found on "https://wizardbook.wordpress.com/2016/05/14/exercise-4-69/"
+  (rule (ends-in-grandson (grandson)))
+  (rule (ends-in-grandson (?greats . ?rel))
+        (ends-in-grandson ?rel))
 
-  (rule ((great grandson) ?x ?y)
-    (and (grandson ?x ?d)
-    (son ?d ?y)))
+; it is dot tail for rel, so grandson should be impelement with little bracket so it would work
+  (rule ((grandson) ?x ?y)
+        (grandson ?x ?y))
+
 
   (rule ((great . ?rel) ?x ?y)
     (and 
-    (last-grandson? ?rel)
+    ; (last-grandson? ?rel)
+    (ends-in-grandson ?rel)
     (son ?y0 ?y)
     (?rel ?x ?y0)))))
+
+    
 (inqu'(
   (last-grandson? (great great grandson))
   (son ?x ?y)
