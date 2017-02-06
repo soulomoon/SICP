@@ -7,3 +7,6 @@
 .#*.scm
 
 compiled
+
+# mac
+.DS_Store 
