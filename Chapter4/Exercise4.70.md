@@ -18,7 +18,7 @@ same is true for under
                      THE-ASSERTIONS))
 ```
 the  `(let ((old-assertions THE-ASSERTIONS))` here 
-let old-assertions take the value of THE-ASSERTIONS.
+let `old-assertions` take the value of `THE-ASSERTIONS`.
 would strip out the outer layer which is a pointer
 
 same here:
