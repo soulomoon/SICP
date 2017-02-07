@@ -17,6 +17,18 @@ same is true for under
         (cons-stream assertion 
                      THE-ASSERTIONS))
 ```
+but there is a defferent case when you stored it in a new var
+
+```scheme
+(define (add-assertion! assertion)
+  (store-assertion-in-index assertion)
+  (let ((old-assertions THE-ASSERTIONS))
+    (set! THE-ASSERTIONS
+          (cons-stream assertion 
+                       old-assertions))
+    'ok))
+```
+    
 the  `(let ((old-assertions THE-ASSERTIONS))` here 
 let `old-assertions` take the value of `THE-ASSERTIONS`.
 would strip out the outer layer which is a pointer
