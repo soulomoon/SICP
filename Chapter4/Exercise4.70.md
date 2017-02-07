@@ -17,7 +17,7 @@ same is true for under
         (cons-stream assertion 
                      THE-ASSERTIONS))
 ```
-the  '(let ((old-assertions THE-ASSERTIONS))' here 
+the  `(let ((old-assertions THE-ASSERTIONS))` here 
 let old-assertions take the value of THE-ASSERTIONS.
 would strip out the outer layer which is a pointer
 
