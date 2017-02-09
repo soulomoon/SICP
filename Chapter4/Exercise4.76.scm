@@ -65,7 +65,7 @@
         frame-stream
         (conjoin-frame
          (qeval (first-conjunct conjuncts) frame-stream)
-         (innner (rest-conjuncts conjuncts) frame-stream))))
+         (delay (innner (rest-conjuncts conjuncts) frame-stream)))))
   ; (display "nie")
   (stream-filter (lambda (s) (not (null? s))) 
                  (innner conjuncts frame-stream)))
@@ -76,7 +76,7 @@
      (stream-map
       (lambda (f2)
         (conjoin-match f1 f2))
-      fs2))
+      (force fs2)))
    fs1))
 
 (define (conjoin-match f1 f2)
