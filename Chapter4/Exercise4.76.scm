@@ -9,14 +9,14 @@
            (newline)
            (display "Assertion added to data base."))
           (else
-          ;  (newline)
+           ;  (newline)
            (display-stream
             (stream-map
              (lambda (frame)
                (instantiate q
-                            frame
-                            (lambda (v f)
-                              (contract-question-mark v))))
+                 frame
+                 (lambda (v f)
+                   (contract-question-mark v))))
              (qeval q (singleton-stream '()))))))))
 (setup-data-base)
 (define (display-stream s)
@@ -24,28 +24,25 @@
 
 (define (try-wraper f n)
   (lambda vars 
-          (define (loop n)
-                  (if (= 0 n)
-                      'done
-                      (begin
-                        (apply f vars)
-                        (loop (- n 1))
-                  )))
-          (loop n)))
+    (define (loop n)
+      (if (= 0 n)
+          'done
+          (begin
+            (apply f vars)
+            (loop (- n 1))
+            )))
+    (loop n)))
 (define inqut
-  (lambda vars (time (apply (try-wraper inqu 10000) vars)))
-)
+  (lambda vars (time (apply (try-wraper inqu 10000) vars))))
 
 
 
 (collect-garbage)
 (inqut
-'(
- (and (job ?x ?y)
-      (address ?x ?ad)
- )
-)
-)
+ '(
+   (and (job ?x ?y)
+        (address ?x ?ad)
+        )))
 
 
 
@@ -67,22 +64,20 @@
     (if (empty-conjunction? conjuncts)
         frame-stream
         (conjoin-frame
-          (qeval (first-conjunct conjuncts) frame-stream)
-          (innner (rest-conjuncts conjuncts) frame-stream))))
+         (qeval (first-conjunct conjuncts) frame-stream)
+         (innner (rest-conjuncts conjuncts) frame-stream))))
   ; (display "nie")
   (stream-filter (lambda (s) (not (null? s))) 
-                 (innner conjuncts frame-stream)
-  )
-)
+                 (innner conjuncts frame-stream)))
 
 (define (conjoin-frame fs1 fs2)
   (stream-flatmap
-    (lambda (f1) 
-            (stream-map
-              (lambda (f2)
-                      (conjoin-match f1 f2))
-              fs2))
-    fs1))
+   (lambda (f1) 
+     (stream-map
+      (lambda (f2)
+        (conjoin-match f1 f2))
+      fs2))
+   fs1))
 
 (define (conjoin-match f1 f2)
   (cond ((null? f1) f2)
@@ -93,58 +88,56 @@
 (define (merge-frame f1 f2)
   (let ((first (car f1))
         (rest (cdr f1)))
-        (let ((var1 (binding-variable first))
-              (val1 (binding-value first)))
-              (let ((b2 (binding-in-frame var1 f2)))
-                    (if (null? rest)
-                      (if b2
-                          (merge-frame rest f2)
-                          (merge-frame rest (cons first f2)))
-                      (cons first f2))))))
+    (let ((var1 (binding-variable first))
+          (val1 (binding-value first)))
+      (let ((b2 (binding-in-frame var1 f2)))
+        (if (null? rest)
+            (if b2
+                (merge-frame rest f2)
+                (merge-frame rest (cons first f2)))
+            (cons first f2))))))
 
 (define (conjoinable? f1 f2)
   (accumulate 
-    (lambda (x y) (and x y))
-    nil
-    (conjoinable-helper f1 f2)))
+   (lambda (x y) (and x y))
+   nil
+   (conjoinable-helper f1 f2)))
 
 (define (conjoinable-helper f1 f2)
   (flatmap
-    (lambda (b1) 
-            (map
-              (lambda (b2)
-                      (binding-match? b1 b2))
-              f2))
-    f1))
+   (lambda (b1) 
+     (map
+      (lambda (b2)
+        (binding-match? b1 b2))
+      f2))
+   f1))
 
 (define (binding-match? b1 b2)
   (let ((var1 (binding-variable b1))
         (var2 (binding-variable b2))
         (val1 (binding-value b1))
         (val2 (binding-value b2)))
-        (if (same-var? var1 var2)
-            (same-var? val1 val2)
-            true)))
+    (if (same-var? var1 var2)
+        (same-var? val1 val2)
+        true)))
             
 (define (same-var? var1 var2)
   (cond ((and (null? var1) (null? var2)) true)
         ((and (pair? var1) (pair? var2)) 
-          (and (same-var? (car var1) (car var2))
-                (same-var? (cdr var1) (cdr var2))))
+         (and (same-var? (car var1) (car var2))
+              (same-var? (cdr var1) (cdr var2))))
         ((and (symbol? var1) (symbol? var2))
-          (eq? var1 var2))
+         (eq? var1 var2))
         (else false)))
 
 (collect-garbage)
 (inqut
-'(
- (and (job ?x ?y)
-      (address ?x ?ad)
- )
-)
-)
+ '(
+   (and (job ?x ?y)
+        (address ?x ?ad)
+        )))
 
-; we 
+; we could see that the second one is running faster
 
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 2048 MB.
