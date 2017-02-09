@@ -137,6 +137,17 @@
         (address ?x ?ad)
         )))
 
+; but there is problem working with not or lisp-value
+(collect-garbage)
+(inqut
+ '(
+   (and (job ?someone ?y)
+        (not (supervisor ?someone ?ad))
+        )))
+; it does not print out and value. because it just merge a empty-stream to the first stream, 
+; the result is then an empty-stream
+
+
 ; we could see that the second one is running faster
 
 ; Welcome to DrRacket, version 6.7 [3m].
