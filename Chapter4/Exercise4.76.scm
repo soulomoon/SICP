@@ -2,13 +2,78 @@
 
 ; Devise an implementation of and that uses this strategy. You must implement a procedure that takes two frames as inputs, checks whether the bindings in the frames are compatible, and, if so, produces a frame that merges the two sets of bindings. This operation is similar to unification.
 (load "/Users/soulomoon/git/SICP/Chapter4/ch4-query.rkt")
+(define (iq query)
+  (let ((q (query-syntax-process query)))
+    (cond ((assertion-to-be-added? q)
+           (add-rule-or-assertion! (add-assertion-body q))
+           (newline)
+           (display "Assertion added to data base."))
+          (else
+          ;  (newline)
+           (display-stream
+            (stream-map
+             (lambda (frame)
+               (instantiate q
+                            frame
+                            (lambda (v f)
+                              (contract-question-mark v))))
+             (qeval q (singleton-stream '()))))))))
+(setup-data-base)
+(define (display-stream s)
+  (= 1 1))
+
+(define (try-wraper f n)
+  (lambda vars 
+          (define (loop n)
+                  (if (= 0 n)
+                      'done
+                      (begin
+                        (apply f vars)
+                        (loop (- n 1))
+                  )))
+          (loop n)))
+(define inqut
+  (lambda vars (time (apply (try-wraper inqu 10000) vars)))
+)
+
+
+
+(collect-garbage)
+(inqut
+'(
+ (and (job ?x ?y)
+      (address ?x ?ad)
+ )
+)
+)
+
+
+
+(define (flatmap proc seq)
+  (accumulate append nil (map proc seq)))
+
+(define (accumulate op initial sequence)
+  (if (null? sequence)
+      initial
+      (op (car sequence)
+          (accumulate op 
+                      initial 
+                      (cdr sequence)))))
+
+
 
 (define (conjoin conjuncts frame-stream)
-  (if (empty-conjunction? conjuncts)
-      frame-stream
-      (conjoin-frame
-        (eval (first-conjunct conjuncts) frame-stream)
-        (conjoin (rest-conjuncts conjuncts) frame-stream))))
+  (define (innner conjuncts frame-stream)
+    (if (empty-conjunction? conjuncts)
+        frame-stream
+        (conjoin-frame
+          (qeval (first-conjunct conjuncts) frame-stream)
+          (innner (rest-conjuncts conjuncts) frame-stream))))
+  ; (display "nie")
+  (stream-filter (lambda (s) (not (null? s))) 
+                 (innner conjuncts frame-stream)
+  )
+)
 
 (define (conjoin-frame fs1 fs2)
   (stream-flatmap
@@ -20,74 +85,72 @@
     fs1))
 
 (define (conjoin-match f1 f2)
-  (define (match? var val)
-    (let ((binding (binding-in-frame var f2)))
-      (if binding
-          (eq? val (binding-value binding)))
-          true))
-  (define (all-match? frame)
-    (let ((binding (car frame))
-          (rest-bindings (cdr frame))
-          (pred (match? 
-                  (binding-variable binding) 
-                  (binding-val binding))))
-          (if (and (null? rest-bindings) pred)
-              true
-              (and
-                pred
-                (all-match? rest-bindings)))))
-  (define (merge frame1 frame2)
-    (if (null? frame1) 
-        frame2
-        (let (var (binding-variable (car frame1)))
-          (if (binding-value (car frame1)) 
-              (merge frame2 (cdr frame1))
-              (cons (car )))
-        )
-  ))
-  (cond 
-        ((null? f1) f2)
+  (cond ((null? f1) f2)
         ((null? f2) f1)
-        ((all-match? f1) (merge-frame f1 f2))
+        ((conjoinable? f1 f2) (merge-frame f1 f2))
         (else the-empty-stream)))
 
-(define (unify-match p1 p2 frame)
-  (cond ((eq? frame 'failed) 'failed)
-        ((equal? p1 p2) frame)
-        ((var? p1)
-         (extend-if-possible p1 p2 frame))
-        ((var? p2)
-         (extend-if-possible 
-          p2 
-          p1 
-          frame))        ; ***
-        ((and (pair? p1) 
-              (pair? p2))
-         (unify-match 
-          (cdr p1) 
-          (cdr p2)
-          (unify-match 
-           (car p1)
-           (car p2)
-           frame)))
-        (else 'failed)))
+(define (merge-frame f1 f2)
+  (let ((first (car f1))
+        (rest (cdr f1)))
+        (let ((var1 (binding-variable first))
+              (val1 (binding-value first)))
+              (let ((b2 (binding-in-frame var1 f2)))
+                    (if (null? rest)
+                      (if b2
+                          (merge-frame rest f2)
+                          (merge-frame rest (cons first f2)))
+                      (cons first f2))))))
 
-(define (stream-accumulate op initial stream)
-  (if (stream-null? stream)
-      initial
-      (op (stream-car stream)
-          (accumulate op 
-                      initial 
-                      (stream-cdr stream)))))
+(define (conjoinable? f1 f2)
+  (accumulate 
+    (lambda (x y) (and x y))
+    nil
+    (conjoinable-helper f1 f2)))
 
+(define (conjoinable-helper f1 f2)
+  (flatmap
+    (lambda (b1) 
+            (map
+              (lambda (b2)
+                      (binding-match? b1 b2))
+              f2))
+    f1))
 
-(define (stream-flatmap proc stream)
-  (stream-accumulate stream-append the-empty-stream (stream-map proc stream)))
+(define (binding-match? b1 b2)
+  (let ((var1 (binding-variable b1))
+        (var2 (binding-variable b2))
+        (val1 (binding-value b1))
+        (val2 (binding-value b2)))
+        (if (same-var? var1 var2)
+            (same-var? val1 val2)
+            true)))
+            
+(define (same-var? var1 var2)
+  (cond ((and (null? var1) (null? var2)) true)
+        ((and (pair? var1) (pair? var2)) 
+          (and (same-var? (car var1) (car var2))
+                (same-var? (cdr var1) (cdr var2))))
+        ((and (symbol? var1) (symbol? var2))
+          (eq? var1 var2))
+        (else false)))
 
-(initialize-data-base microshaft-data-base)
-
-(inqu
+(collect-garbage)
+(inqut
 '(
+ (and (job ?x ?y)
+      (address ?x ?ad)
+ )
+)
+)
 
-)
-)
+; we 
+
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: SICP (PLaneT 1.18); memory limit: 2048 MB.
+; 'done
+; cpu time: 674 real time: 693 gc time: 443
+; 'done
+; cpu time: 279 real time: 280 gc time: 5
+; 'done
+; > 
