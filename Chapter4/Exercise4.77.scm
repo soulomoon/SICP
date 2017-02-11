@@ -33,7 +33,7 @@
        (combine-promises 
         (get-promise frame)
         promise)
-       frame)
+       (get-frame frame))
       (list 'promise-frame promise frame)))
   
 
