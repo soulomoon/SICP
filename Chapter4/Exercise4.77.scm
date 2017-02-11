@@ -111,6 +111,8 @@
   (make-promise-frame (lambda (frame) (lisp-value-inner call frame)) frame-stream))
 
 ; but the there are problems that if "or" inside "and" the not still not normal, because the not would be evluated inside "or"
+; a more accurate answer to this question can be found here(though I have not test it):
+; https://github.com/l0stman/sicp/blob/master/4.77.tex
 (setup-data-base)
 (inqu
  '(
