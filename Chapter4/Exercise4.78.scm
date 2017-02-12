@@ -762,10 +762,17 @@
 ; because you can not dectest the first fail has come to an end to interleave it with the second one,
 ; so you have to place the second fail in the begin and wait it run out then get the the first one.
 
+; somthing is interesting that , if you use try-again to find out alternative , it would actually trace back to the last query alternative, if the newest run out 
 (i
 '(
   (or (supervisor ?x ?y)
       (job ?z ?g))
+  (and (lives-near ?x ?y)
+       (job ?x ?k)
+       (not (job ?x (computer ?z))))
+    (or (supervisor ?x ?y)
+      (job ?z ?g))
+
   try-again
   try-again
   try-again
@@ -785,8 +792,148 @@
   try-again
   try-again
   try-again
-  ; (and (lives-near ?x ?y)
-  ;      (job ?x ?k)
-  ;      (not (job ?x (computer ?z))))
-  ; try-again
+  try-again
+  try-again
+  try-again
 ))
+
+; Welcome to DrRacket, version 6.7 [3m].
+; Language: SICP (PLaneT 1.18); memory limit: 2048 MB.
+; 'ok
+; 'ok
+; 'ok
+; 'ok
+; 'ok
+; 'done
+
+
+; ;;; Amb-Eval input:
+; (or (supervisor ?x ?y) (job ?z ?g))
+; ;;; Starting a new problem 
+; ;;; Amb-Eval value:
+; (or (supervisor (Aull DeWitt) (Warbucks Oliver)) (job ?z ?g))
+
+; ;;; Amb-Eval input:
+; (and (lives-near ?x ?y) (job ?x ?k) (not (job ?x (computer ?z))))
+; ;;; Starting a new problem 
+; ;;; Amb-Eval value:
+; (and (lives-near (Aull DeWitt) (Reasoner Louis)) (job (Aull DeWitt) (administration secretary)) (not (job (Aull DeWitt) (computer ?z))))
+
+; ;;; Amb-Eval input:
+; (or (supervisor ?x ?y) (job ?z ?g))
+; ;;; Starting a new problem 
+; ;;; Amb-Eval value:
+; (or (supervisor (Aull DeWitt) (Warbucks Oliver)) (job ?z ?g))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor (Cratchet Robert) (Scrooge Eben)) (job ?z ?g))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor (Scrooge Eben) (Warbucks Oliver)) (job ?z ?g))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor (Bitdiddle Ben) (Warbucks Oliver)) (job ?z ?g))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor (Reasoner Louis) (Hacker Alyssa P)) (job ?z ?g))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor (Tweakit Lem E) (Bitdiddle Ben)) (job ?z ?g))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor (Fect Cy D) (Bitdiddle Ben)) (job ?z ?g))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor (Hacker Alyssa P) (Bitdiddle Ben)) (job ?z ?g))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor ?x ?y) (job (Aull DeWitt) (administration secretary)))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor ?x ?y) (job (Cratchet Robert) (accounting scrivener)))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor ?x ?y) (job (Scrooge Eben) (accounting chief accountant)))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor ?x ?y) (job (Warbucks Oliver) (administration big wheel)))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor ?x ?y) (job (Reasoner Louis) (computer programmer trainee)))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor ?x ?y) (job (Tweakit Lem E) (computer technician)))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor ?x ?y) (job (Fect Cy D) (computer programmer)))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor ?x ?y) (job (Hacker Alyssa P) (computer programmer)))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor ?x ?y) (job (Bitdiddle Ben) (computer wizard)))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; There are no more values of
+; (or (supervisor ?x ?y) (job ?z ?g))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (and (lives-near (Aull DeWitt) (Bitdiddle Ben)) (job (Aull DeWitt) (administration secretary)) (not (job (Aull DeWitt) (computer ?z))))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (and (lives-near (Reasoner Louis) (Aull DeWitt)) (job (Reasoner Louis) (computer programmer trainee)) (not (job (Reasoner Louis) (computer ?z))))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (and (lives-near (Reasoner Louis) (Bitdiddle Ben)) (job (Reasoner Louis) (computer programmer trainee)) (not (job (Reasoner Louis) (computer ?z))))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; There are no more values of
+; (and (lives-near ?x ?y) (job ?x ?k) (not (job ?x (computer ?z))))
+
+; ;;; Amb-Eval input:
+; try-again
+; ;;; Amb-Eval value:
+; (or (supervisor (Cratchet Robert) (Scrooge Eben)) (job ?z ?g))
+
+; ;;; Amb-Eval input:
+; 'end
