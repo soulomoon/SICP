@@ -86,7 +86,7 @@
           (else exp)))
   (copy exp))
 
-(define (analyze query)
+(define (qanalyze query)
   (let ((qanalyze (get (type query) 'qeval)))
     ; (newline )
     ; (display "qanalyze:" )
@@ -99,7 +99,7 @@
         (analyze-simple-query query))))
 ; 4.4.4.2The Evaluator
 (define (qeval query frame succeed fail)
-  ((analyze query) frame succeed fail))
+  ((qanalyze query) frame succeed fail))
 
 ; Simple queries
 (define (analyze-simple-query query-pattern)
@@ -134,22 +134,47 @@
           fail))))
 (put 'and 'qeval analyze-conjoin)
 
-(define (disjoin disjuncts frame-stream)
-  (if (empty-disjunction? disjuncts)
-      the-empty-stream
-      (interleave-delayed
-       (qeval (first-disjunct disjuncts) 
-              frame-stream)
-       (delay (disjoin 
-               (rest-disjuncts disjuncts)
-               frame-stream)))))
-(put 'or 'qeval disjoin)
+(define (analyze-disjoin disjuncts)
+  (lambda (frame succeed fail)
+    (if (empty-disjunction? disjuncts)
+        (succeed frame fail)
+        (qeval 
+          (first-conjunct disjuncts)
+          frame
+          succeed
+          (lambda ()
+                  ((analyze-disjoin (cdr disjuncts))
+                    frame
+                    succeed
+                    fail))))))
+(put 'or 'qeval analyze-disjoin)
 
+; Filters
+(define (analyze-negate operands)
+   (lambda (frame succeed fail)
+      (qeval (negated-query operands)
+             frame
+             (lambda (frame fail2) (fail))
+             (lambda () (succeed frame fail)))))
+(put 'not 'qeval analyze-negate)
 
 (define (always-true ignore frame) 
   frame)
 (put 'always-true 'qeval always-true)
 
+(define (analyze-lisp-value call)
+  (lambda (frame succeed fail)
+     (if (execute
+          (instantiate
+           call
+           frame
+           (lambda (v f)
+             (error 
+              "Unknown pat var: LISP-VALUE" 
+              v))))
+         (succeed frame fail)
+         (fail))))
+(put 'lisp-value 'qeval analyze-lisp-value)
 ; 4.4.4.3Finding Assertions by Pattern Matching
 ; similar to analyze-amb
 (define (analyze-find-assertions pattern)
@@ -579,6 +604,13 @@
                                      (stream-cdr stream))))
         (else (stream-filter pred (stream-cdr stream)))))
 ; (query-driver-loop)
+(load "/Users/soulomoon/git/SICP/Chapter4/ch4-query-mceval.rkt")
+; (load "/Users/soulomoon/git/SICP/Chapter4/ch4-query-streams.rkt")
+
+(define user-initial-environment (setup-environment))
+(define (execute exp)
+  (apply# (eval# (predicate exp) user-initial-environment)
+         (args exp)))
 
 (define (interpret input)
   (ambeval input
@@ -754,11 +786,12 @@
   (initialize-data-base microshaft-data-base))
 
 (setup-data-base)
+
 (i
 '(
   ; (and (job ?x ?y))
-  (and (job ?x ?y)
-       (address ?x ?k))
+  (and (salary ?x ?y)
+       (lisp-value = ?y 25000))
   try-again
   try-again
   try-again
