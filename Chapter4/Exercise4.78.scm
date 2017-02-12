@@ -40,34 +40,6 @@
 
 (define put (operation-table 'insert-proc!))
 
-(define (prompt-for-input string)
-  (newline) (newline) (display string) (newline))
-(define input-prompt  ";;; Query input:")
-(define output-prompt ";;; Query results:")
-(define (query-driver-loop)
-  (prompt-for-input input-prompt)
-  (let ((q (query-syntax-process (read))))
-    (cond ((assertion-to-be-added? q)
-           (add-rule-or-assertion! 
-            (add-assertion-body q))
-           (newline)
-           (display 
-            "Assertion added to data base.")
-           (query-driver-loop))
-          (else
-           (newline)
-           (display output-prompt)
-           (display-stream
-            (stream-map
-             (lambda (frame)
-               (instantiate
-                q
-                frame
-                (lambda (v f)
-                  (contract-question-mark v))))
-             (qeval q (singleton-stream '()))))
-           (query-driver-loop)))))
-
 (define (instantiate 
          exp frame unbound-var-handler)
   (define (copy exp)
@@ -88,15 +60,10 @@
 
 (define (qanalyze query)
   (let ((qanalyze (get (type query) 'qeval)))
-    ; (newline )
-    ; (display "qanalyze:" )
-    ; (display qanalyze )
-    ; (display (type query))
-    ; (newline )
-
     (if qanalyze
         (qanalyze (contents query))
         (analyze-simple-query query))))
+
 ; 4.4.4.2The Evaluator
 (define (qeval query frame succeed fail)
   ((qanalyze query) frame succeed fail))
@@ -112,6 +79,7 @@
                   frame 
                   succeed
                   (lambda () (rule-proc frame succeed fail))))))
+
 ; Compound queries
 (define (analyze-conjoin conjuncts)
   (lambda (frame succeed fail)
@@ -131,16 +99,27 @@
 (define (analyze-disjoin disjuncts)
   (lambda (frame succeed fail)
     (if (empty-disjunction? disjuncts)
-        (succeed frame fail)
+        (fail)
         (qeval 
           (first-conjunct disjuncts)
           frame
           succeed
+          ; (lambda (frame2 fail2) 
+          ;   (succeed 
+          ;     frame2 
+          ;     (lambda () 
+          ;             ((analyze-disjoin (cdr disjuncts))
+          ;                 frame
+          ;                 succeed
+          ;                 fail2
+          ;                 ))))
+          ; fail
           (lambda ()
                   ((analyze-disjoin (cdr disjuncts))
                     frame
                     succeed
-                    fail))))))
+                    fail))
+          ))))
 (put 'or 'qeval analyze-disjoin)
 
 ; Filters
@@ -604,26 +583,14 @@
                       (stream-filter pred
                                      (stream-cdr stream))))
         (else (stream-filter pred (stream-cdr stream)))))
-; (query-driver-loop)
+
+; for lisp-value
 (load "/Users/soulomoon/git/SICP/Chapter4/ch4-query-mceval.rkt")
-; (load "/Users/soulomoon/git/SICP/Chapter4/ch4-query-streams.rkt")
 
 (define user-initial-environment (setup-environment))
 (define (execute exp)
   (apply# (eval# (predicate exp) user-initial-environment)
          (args exp)))
-
-(define (interpret input)
-  (ambeval input
-           the-global-environment
-           ;; ambeval success
-           (lambda (val next-alternative)
-             val)
-           ;; ambeval failure
-           (lambda ()
-             (newline)
-             (display "fail")
-             (newline))))
 
 (define input-prompt  ";;; Amb-Eval input:")
 (define output-prompt ";;; Amb-Eval value:")
@@ -675,10 +642,12 @@
      (display 
       ";;; There is no current problem")
      (i query))))
+
 (define (list->stream l)
   (if (null? l)
       the-empty-stream
       (cons-stream (car l) (list->stream (cdr l)))))
+
 (define (initialize-data-base rules-and-assertions)
   (define (deal-out r-and-a rules assertions)
     (cond ((null? r-and-a)
@@ -788,9 +757,36 @@
 
 (setup-data-base)
 
+; i could not but able to interleave or in the old way, 
+; because in continueation style, one disjoin have to be run out to get to the next.
+; because you can not dectest the first fail has come to an end to interleave it with the second one,
+; so you have to place the second fail in the begin and wait it run out then get the the first one.
+
 (i
 '(
-  (and (lives-near ?x ?y)
-       (job ?y (computer ?z)))
+  (or (supervisor ?x ?y)
+      (job ?z ?g))
   try-again
-  try-again))
+  try-again
+  try-again
+  try-again
+  try-again
+  try-again
+  try-again
+  try-again
+  try-again
+  try-again
+  try-again
+  try-again
+  try-again
+  try-again
+  try-again
+  try-again
+  try-again
+  try-again
+  try-again
+  ; (and (lives-near ?x ?y)
+  ;      (job ?x ?k)
+  ;      (not (job ?x (computer ?z))))
+  ; try-again
+))
