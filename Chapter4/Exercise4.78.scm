@@ -104,29 +104,23 @@
 ; Simple queries
 (define (analyze-simple-query query-pattern)
   ; analyze each
-  (let ((assertion-proc (analyze-find-assertions query-pattern)))
-        ; (rule-proc (analyze-apply-rules query-pattern)))
-        ; try assertion then rule 
+  (let ((assertion-proc (analyze-find-assertions query-pattern))
+        (rule-proc (analyze-apply-rules query-pattern)))
+        ; try assertion if fail then rule 
         (lambda (frame succeed fail)
-                ; (succeed
-                  ; (lambda (frame succeed fail2)
                 (assertion-proc 
                   frame 
                   succeed
-                      ; if fail try rule
-                      ; fail2
-                      ; (lambda (frame succeed fail3) (rule-proc frame succeed fail3)))))
-                  fail))))
+                  (lambda () (rule-proc frame succeed fail))))))
 ; Compound queries
 (define (analyze-conjoin conjuncts)
-  ; (display "123")
   (lambda (frame succeed fail)
     (if (empty-conjunction? conjuncts)
         (succeed frame fail)
         (qeval 
           (first-conjunct conjuncts)
           frame
-          (lambda (frame2 fail2) 
+          (lambda (frame2 fail2)
                   ((analyze-conjoin (cdr conjuncts))
                     frame2
                     succeed
@@ -154,12 +148,14 @@
    (lambda (frame succeed fail)
       (qeval (negated-query operands)
              frame
+            ;  hack here to track back to the recent analyzed use (fail) directly
              (lambda (frame fail2) (fail))
              (lambda () (succeed frame fail)))))
 (put 'not 'qeval analyze-negate)
-
-(define (always-true ignore frame) 
-  frame)
+; always-true in pass-continueation style
+(define (always-true ignore) 
+  (lambda (frame succeed fail)
+          (succeed frame fail)))
 (put 'always-true 'qeval always-true)
 
 (define (analyze-lisp-value call)
@@ -189,7 +185,6 @@
   (let ((match-result
          (pattern-match 
           query-pat assertion query-frame)))
-          ; (display match-result)
     (if (eq? match-result 'failed)
         (fail)
         (succeed match-result fail))))
@@ -216,15 +211,15 @@
         (extend var dat frame))))
 
 ; 4.4.4.4Rules and Unification
-(define (apply-rules pattern frame)
-  (stream-flatmap 
-   (lambda (rule)
-     (apply-a-rule rule pattern frame))
-   (fetch-rules pattern frame)))
+(define (analyze-apply-rules pattern)
+  (let ((rule-proc (analyze-fetch-rules pattern)))
+    (lambda (frame succeed fail)
+      (rule-proc 
+        (lambda (rule fail2)
+          (apply-a-rule rule pattern frame succeed fail2))
+        fail))))
 
-(define (apply-a-rule rule
-                      query-pattern
-                      query-frame)
+(define (apply-a-rule rule query-pattern query-frame succeed fail)
   (let ((clean-rule 
          (rename-variables-in rule)))
     (let ((unify-result
@@ -232,10 +227,8 @@
                         (conclusion clean-rule)
                         query-frame)))
       (if (eq? unify-result 'failed)
-          the-empty-stream
-          (qeval (rule-body clean-rule)
-                 (singleton-stream 
-                  unify-result))))))
+          (fail)
+          (qeval (rule-body clean-rule) unify-result succeed fail)))))
 
 (define (rename-variables-in rule)
   (let ((rule-application-id 
@@ -340,10 +333,18 @@
 
 (define THE-RULES the-empty-stream)
 
-(define (fetch-rules pattern frame)
-  (if (use-index? pattern)
-      (get-indexed-rules pattern)
-      (get-all-rules)))
+(define (analyze-fetch-rules pattern)
+  (let ((rules
+          (if (use-index? pattern)
+              (get-indexed-rules pattern)
+              (get-all-rules))))
+    (lambda (succeed fail)
+    (define (try-next choices)
+      (if (null? choices)
+          (fail)
+          (succeed (stream-car choices) 
+                  (lambda () (try-next (stream-cdr choices))))))
+    (try-next rules))))
 
 (define (get-all-rules) THE-RULES)
 
@@ -789,20 +790,7 @@
 
 (i
 '(
-  ; (and (job ?x ?y))
-  (and (salary ?x ?y)
-       (lisp-value = ?y 25000))
+  (and (lives-near ?x ?y)
+       (job ?y (computer ?z)))
   try-again
-  try-again
-  try-again
-  try-again
-  try-again
-  try-again
-  try-again
-  try-again
-  try-again
-  try-again
-  try-again
-  try-again
-)
-)
+  try-again))
