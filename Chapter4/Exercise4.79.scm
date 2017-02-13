@@ -66,6 +66,13 @@
 (define (binding-in-frame variable frame)
   (assoc variable (frame-body frame)))
 
+; recursive tracing to var, bug if looping
+(define (recursive-trace variable frame)
+  (let ((binding (binding-in-frame variable frame)))
+       (if binding
+           (recursive-trace (binding-value binding) frame)
+           variable)))
+
 (define (binding-in-parent-frame variable frame)
   (binding-in-frame variable (outer frame)))
 
@@ -166,15 +173,17 @@
 ; helper function to extend the frame with layer with rule
 (define (extend-rule-frame p1 p2 frame)
   (cond ((eq? frame 'failed) 'failed)
-        ((equal? p1 p2) frame)
-        ((var? p1) (extend-if-possible p1 p2 frame))
-        ((var? p2) (extend-if-possible p1 p2 frame)) ; {\em ; ***}
+        ; count down to lowest level to avoid confict of ?x ?x
+        ((eq? p1 p2) frame)
+        ; if either is var, trace and extend to layer.
+        ((or (var? p1) (var? p1)) 
+          (extend-if-possible (recursive-trace p1 (outer frame)) (recursive-trace p2 frame) frame))
         ((and (pair? p1) (pair? p2))
-         (unify-match (cdr p1)
-                      (cdr p2)
-                      (unify-match (car p1)
-                                   (car p2)
-                                   frame)))
+         (extend-rule-frame (cdr p1)
+                            (cdr p2)
+                            (extend-rule-frame (car p1)
+                                               (car p2)
+                                               frame)))
         (else 'failed)))
 
 (define (extend-layer-if-possible var val frame)
@@ -193,7 +202,7 @@
           (else (extend var val frame)))))
 
 (define (apply-a-rule rule query-pattern query-frame)
-  (let ((extend-frame (extend-rule-frame (conclusion rule) (add-frame query-frame))))
+  (let ((extend-frame (extend-rule-frame query-pattern (conclusion rule) (add-frame query-frame))))
     (let ((unify-result
            (unify-match query-pattern
                         (conclusion rule)
