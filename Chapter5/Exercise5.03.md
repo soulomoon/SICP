@@ -104,6 +104,6 @@
 ;>
 ```
 data-path:  
-![data-path](../material/photos/5.03.1-data-path.jpg)
+![data-path](../material/photos/5.03.1-data-path.jpg)  
 controller:  
-![controller](../material/photos/5.03.1-controller.jpg)
+![controller](../material/photos/5.03.1-controller.jpg)  
