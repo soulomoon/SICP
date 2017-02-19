@@ -1,3 +1,4 @@
+```scheme
 ; Exercise 5.2: Use the register-machine language to describe the iterative factorial machine of Exercise 5.1.
 (load "/Users/soulomoon/git/SICP/Chapter5/ch5-regsim.scm")
 
@@ -101,3 +102,8 @@
 ;1.4142156862745097
 ;'done
 ;>
+```
+data-path:
+![data-path](../material/photos/5.03.1-data-path.jpg)
+controller:
+![controller](../material/photos/5.03.1-controller.jpg)
