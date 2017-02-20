@@ -1,3 +1,4 @@
+```Scheme
 ;Exercise 5.4: Specify register machines that implement each of the following procedures. For each machine, write a controller instruction sequence and draw a diagram showing the data paths.
 ;
 ;Recursive exponentiation:
@@ -52,7 +53,7 @@
 ;Iterative exponentiation:
 (define expt-machine2
   (make-machine
-    '(b n c p continue)
+    '(b n c p)
     (list (list '* *) (list '- -) (list 'print print) (list '= =))
     '(
       (assign c (reg n))
@@ -89,3 +90,6 @@
 ;25
 ;'done
 ;>
+```
+data-path:  
+![data-path](../material/photos/Exercise 5.4 data-path.png)
