@@ -1,107 +1,58 @@
 ```scheme
-; Exercise 5.2: Use the register-machine language to describe the iterative factorial machine of Exercise 5.1.
-(load "/Users/soulomoon/git/SICP/Chapter5/ch5-regsim.scm")
-
-(define (average x y) (/ (+ x y) 2))
-(define (square x) (* x x))
-(define (good-enough? guess x)
-  (< (abs (- (square guess) x)) 0.001))
-(define (improve guess x)
-  (average guess (/ x guess)))
-(define (print x)
-  (newline )
-  (display x)
-  (newline ))
-(define GCD-machine
+;Exercise 5.3: Design a machine to compute square roots using Newton’s method, as described in 1.1.7:
+;
+(define (sqrt x)
+  (define (good-enough? guess)
+    (< (abs (- (square guess) x)) 0.001))
+  (define (improve guess)
+    (average guess (/ x guess)))
+  (define (sqrt-iter guess)
+    (if (good-enough? guess)
+        guess
+        (sqrt-iter (improve guess))))
+  (sqrt-iter 1.0))
+;Begin by assuming that good-enough? and improve operations are available as primitives. Then show how to expand these in terms of arithmetic operations. Describe each version of the sqrt machine design by drawing a data-path diagram and writing a controller definition in the register-machine language.(load "/Users/soulomoon/git/SICP/Chapter5/ch5-regsim.scm")
+(define factorial-machine
 (make-machine
-  '(g x)
-  (list (list 'good-enough? good-enough?) (list 'improve improve) (list 'print print))
+  '(c p n)
+  (list (list '+ +) (list '* *) (list '> >))
   '(
-    (assign g (const 1.0))
+    (assign c (const 1))
+    (assign p (const 1))
   test->
-    (test (op good-enough?) (reg g) (reg x))
-    (branch (label GCD-done))
-    (assign g (op improve) (reg g) (reg x))
+    (test (op >) (reg c) (reg n))
+    (branch (label factorial-done))
+    (assign p (op *) (reg c) (reg p))
+    (assign c (op +) (reg c) (const 1))
     (goto (label test->))
-  GCD-done
-    (perform (op print) (reg g))
+  factorial-done
 )))
 
-(define GCD-machine2
+(define factorial-machine1
 (make-machine
-  '(g x t)
-  (list
-    (list '< <)
-    (list '- -)
-    (list 'abs abs)
-    (list 'square square)
-    (list 'improve improve)
-    (list 'print print))
+  '(c p r t n)
+  (list (list '+ +) (list '* *) (list '> >))
   '(
-    (assign g (const 1.0))
-  test->
-    (assign t (op square) (reg g))
-    (assign t (op -) (reg t) (reg x))
-    (assign t (op abs) (reg t))
-    (test (op <) (reg t) (const 0.001))
-    (branch (label GCD-done))
-    (assign g (op improve) (reg g) (reg x))
-    (goto (label test->))
-  GCD-done
-    (perform (op print) (reg g))
+    (assign c (const 1))
+    (assign p (const 1))
+  test-c
+    (test (op >) (reg c) (reg n))
+    (branch (label f-done))
+    (assign r (op *) (reg c) (reg p))
+    (assign p r)
+    (assign t (op +) (reg c) (const 1))
+    (assign c t)
+    (goto (label test-c))
+  f-done
 )))
 
-(define GCD-machine3
-(make-machine
-  '(g x t)
-  (list
-    (list '< <)
-    (list '- -)
-    (list '/ /)
-    (list 'abs abs)
-    (list 'square square)
-    (list 'average average)
-    (list 'improve improve)
-    (list 'print print))
-  '(
-    (assign g (const 1.0))
-  test->
-    (assign t (op square) (reg g))
-    (assign t (op -) (reg t) (reg x))
-    (assign t (op abs) (reg t))
-    (test (op <) (reg t) (const 0.001))
-    (branch (label GCD-done))
-    (assign t (op /) (reg x) (reg g))
-    (assign g (op average) (reg g) (reg t))
-    (goto (label test->))
-  GCD-done
-    (perform (op print) (reg g))
-)))
+(set-register-contents! factorial-machine 'n 5)
+(start factorial-machine)
+(get-register-contents factorial-machine 'p)
 
-
-(set-register-contents! GCD-machine 'x 2)
-(start GCD-machine)
-(set-register-contents! GCD-machine2 'x 2)
-(start GCD-machine2)
-(set-register-contents! GCD-machine3 'x 2)
-(start GCD-machine3)
-
-;Welcome to DrRacket, version 6.8 [3m].
-;Language: SICP (PLaneT 1.18); memory limit: 128 MB.
-;(REGISTER SIMULATOR LOADED)
-;'done
-;
-;1.4142156862745097
-;'done
-;'done
-;
-;1.4142156862745097
-;'done
-;'done
-;
-;1.4142156862745097
-;'done
-;>
+(set-register-contents! factorial-machine1 'n 5)
+(start factorial-machine1)
+(get-register-contents factorial-machine1 'p)
 ```
 data-path:  
 ![data-path](../material/photos/5.03.1-data-path.jpg)  
