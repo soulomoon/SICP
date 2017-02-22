@@ -25,10 +25,10 @@
         (aprocs
          (map (lambda (e)
                 (begin
-                  (if (or (label-exp? e) (register-exp? e))
+                  (if (or (constant-exp? e) (register-exp? e))
                       (make-primitive-exp
-                        e machine labels))
-                      (error "make-operation-exp : not label or register :" "" e "")))
+                        e machine labels)
+                      (error "make-operation-exp : not const or register :" "" e ""))))
               (operation-exp-operands exp))))
     (lambda () (apply op (map (lambda (p) (p))
                               aprocs)))))
@@ -53,5 +53,5 @@
 ;
 ;(((assign a (const 1)) . #<procedure:...5/ch5-regsim.scm:257:6>) ((perform (op print) (reg a)) . #<procedure:...5/ch5-regsim.scm:342:10>) ((perform (op print) (label here)) . #<procedure:...5/ch5-regsim.scm:342:10>))
 ;'done
-;. . make-operation-exp : not label or register : "" (reg a) ""
+;. . make-operation-exp : not const or register : "" (label here) ""
 ;>
