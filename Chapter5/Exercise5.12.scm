@@ -10,7 +10,13 @@
   (newline )
   (display x)
   (newline ))
+(define (filter f isequence)
+  (cond ((null? isequence)
+          isequence)
+        ((f (car isequence))
+          (cons (car isequence) (filter f (cdr isequence))))
 
+        (else (filter f (cdr isequence)))))
 (define (symbol>? a b)
   (string>? (symbol->string a) (symbol->string b)))
 (define (sort isequence)
@@ -41,6 +47,11 @@
         (else
           (cons (car isequence) (unique (cdr isequence))))))
 
+(define (goto-register? inst)
+  (if (and (tagged-list? inst 'goto) (register-exp? (goto-dest inst)))
+      true
+      false))
+
 (define (make-new-machine)
   (let ((pc (make-register 'pc))
         (flag (make-register 'flag))
@@ -59,6 +70,9 @@
       (define (get-instructions)
         (sort (unique (map car the-instruction-isequence))))
 
+      (define (get-goto-register)
+        (map (lambda (inst) (register-exp-reg (goto-dest inst)))
+             (filter goto-register? (get-instructions))))
 
       (define (allocate-register name)
         (if (assoc name register-table)
@@ -91,7 +105,8 @@
                (lambda (ops) (set! the-ops (append the-ops ops))))
               ((eq? message 'stack) stack)
               ((eq? message 'operations) the-ops)
-              ((eq? message 'instructions) (get-instructions))
+              ((eq? message 'get-instructions) (get-instructions))
+              ((eq? message 'get-goto-register) (get-goto-register))
               (else (error "Unknown request -- MACHINE" message))))
       dispatch)))
 
@@ -141,6 +156,8 @@
     fib-done
     (perform (op print) (reg val))
 )))
-(for-each (lambda (x) (display x)(newline )) (fib-machine 'instructions))
+(for-each (lambda (x) (display x)(newline )) (fib-machine 'get-instructions))
+(newline )
+(for-each (lambda (x) (display x)(newline )) (fib-machine 'get-goto-register))
 (set-register-contents! fib-machine 'n 9)
 (start fib-machine)
