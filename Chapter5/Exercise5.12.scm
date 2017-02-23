@@ -52,6 +52,11 @@
       true
       false))
 
+(define (save-restore? inst)
+  (if (or (tagged-list? inst 'save) (tagged-list? inst 'restore))
+      true
+      false))
+
 (define (make-new-machine)
   (let ((pc (make-register 'pc))
         (flag (make-register 'flag))
@@ -73,6 +78,12 @@
       (define (get-goto-register)
         (map (lambda (inst) (register-exp-reg (goto-dest inst)))
              (filter goto-register? (get-instructions))))
+
+      (define (save-restore-register)
+        (unique
+          (map (lambda (inst) (stack-inst-reg-name inst))
+             (filter save-restore? (get-instructions)))))
+
 
       (define (allocate-register name)
         (if (assoc name register-table)
@@ -107,6 +118,7 @@
               ((eq? message 'operations) the-ops)
               ((eq? message 'get-instructions) (get-instructions))
               ((eq? message 'get-goto-register) (get-goto-register))
+              ((eq? message 'save-restore-register) (save-restore-register))
               (else (error "Unknown request -- MACHINE" message))))
       dispatch)))
 
@@ -156,8 +168,12 @@
     fib-done
     (perform (op print) (reg val))
 )))
-(for-each (lambda (x) (display x)(newline )) (fib-machine 'get-instructions))
-(newline )
-(for-each (lambda (x) (display x)(newline )) (fib-machine 'get-goto-register))
+(define (show-list l)
+  (for-each (lambda (x) (display x)(newline )) l)(newline))
+
+(show-list (fib-machine 'get-instructions))
+(show-list (fib-machine 'get-goto-register))
+
+(show-list (fib-machine 'save-restore-register))
 (set-register-contents! fib-machine 'n 9)
 (start fib-machine)
