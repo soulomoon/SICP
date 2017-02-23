@@ -57,6 +57,13 @@
       true
       false))
 
+(define (make-assign? name)
+  (define (assign? inst)
+    (if (and (tagged-list? inst 'assign) (eq? (assign-reg-name inst) name))
+        true
+        false))
+  assign?)
+
 (define (make-new-machine)
   (let ((pc (make-register 'pc))
         (flag (make-register 'flag))
@@ -83,6 +90,16 @@
         (unique
           (map (lambda (inst) (stack-inst-reg-name inst))
              (filter save-restore? (get-instructions)))))
+
+      (define (assign-source)
+        (map
+          (lambda (name)
+            (cons name
+              (unique
+                (map (lambda (inst) (assign-value-exp inst))
+                   (filter (make-assign? name) (get-instructions))))))
+          (map car register-table)
+        ))
 
 
       (define (allocate-register name)
@@ -119,6 +136,7 @@
               ((eq? message 'get-instructions) (get-instructions))
               ((eq? message 'get-goto-register) (get-goto-register))
               ((eq? message 'save-restore-register) (save-restore-register))
+              ((eq? message 'assign-source) (assign-source))
               (else (error "Unknown request -- MACHINE" message))))
       dispatch)))
 
@@ -173,7 +191,42 @@
 
 (show-list (fib-machine 'get-instructions))
 (show-list (fib-machine 'get-goto-register))
-
 (show-list (fib-machine 'save-restore-register))
-(set-register-contents! fib-machine 'n 9)
-(start fib-machine)
+(show-list (fib-machine 'assign-source))
+;
+;Welcome to DrRacket, version 6.8 [3m].
+;Language: SICP (PLaneT 1.18); memory limit: 128 MB.
+;(REGISTER SIMULATOR LOADED)
+;(assign continue (label fib-done))
+;(assign continue (label afterfib-n-1))
+;(assign n (op -) (reg n) (const 1))
+;(assign n (op -) (reg n) (const 2))
+;(assign continue (label afterfib-n-2))
+;(assign n (reg val))
+;(assign val (op +) (reg val) (reg n))
+;(assign val (reg n))
+;(branch (label immediate-answer))
+;(goto (label fib-loop))
+;(goto (reg continue))
+;(perform (op print) (reg val))
+;(restore n)
+;(restore val)
+;(restore continue)
+;(save continue)
+;(save n)
+;(save val)
+;(test (op <) (reg n) (const 2))
+;
+;continue
+;
+;continue
+;n
+;val
+;
+;(continue ((label fib-done)) ((label afterfib-n-1)) ((label afterfib-n-2)))
+;(val ((op +) (reg val) (reg n)) ((reg n)))
+;(n ((op -) (reg n) (const 1)) ((op -) (reg n) (const 2)) ((reg val)))
+;(pc)
+;(flag)
+;
+;>
