@@ -45,33 +45,34 @@
         (flag (make-register 'flag))
         (stack (make-stack))
         (the-instruction-sequence '())
-        (trace '())
+        (trace-on
+          (lambda (inst)
+                  (display (instruction-last-label inst))
+                  (display ":")
+                  (display (instruction-text inst))
+                  (newline )))
+       (trace-off (lambda (inst) 'done))
         (instruction-counter 0))
-    (let ((the-ops
-           (list
-                 (list 'trace-off
-                       (lambda () (set! trace
-                                        (lambda (inst) 'done))))
-                 (list 'trace-on
-                       (lambda () (set! trace
-                                        (lambda (inst)
-                                                (display (instruction-last-label inst))
-                                                (display ":")
-                                                (display (instruction-text inst))
-                                                (newline )))))
-                 (list 'initialize-stack
-                       (lambda () (stack 'initialize)))
-                 ;;**next for monitored stack (as in section 5.2.4)
-                 ;;  -- comment out if not wanted
-                 (list 'print-stack-statistics
-                       (lambda () (stack 'print-statistics)))
-                 (list 'instruction-counter
-                       (lambda () (display "instruction-counter: ")
-                                  (display instruction-counter)
-                                  (newline )
-                                  (set! instruction-counter 0)))))
-          (register-table
-           (list (list 'pc pc) (list 'flag flag))))
+    (let ((trace trace-off))
+      (let ((the-ops
+             (list
+                   (list 'trace-off
+                         (lambda () (set! trace trace-off)))
+                   (list 'trace-on
+                         (lambda () (set! trace trace-on)))
+                   (list 'initialize-stack
+                         (lambda () (stack 'initialize)))
+                   ;;**next for monitored stack (as in section 5.2.4)
+                   ;;  -- comment out if not wanted
+                   (list 'print-stack-statistics
+                         (lambda () (stack 'print-statistics)))
+                   (list 'instruction-counter
+                         (lambda () (display "instruction-counter: ")
+                                    (display instruction-counter)
+                                    (newline )
+                                    (set! instruction-counter 0)))))
+            (register-table
+             (list (list 'pc pc) (list 'flag flag))))
       (define (allocate-register name)
         (if (assoc name register-table)
             (error "Multiply defined register: " name)
@@ -84,14 +85,6 @@
           (if val
               (cadr val)
               (error "Unknown register:" name))))
-      (define (trace-on inst)
-        (display (instruction-last-label inst))
-        (display ":")
-        (display (instruction-text inst))
-        (newline ))
-      (define (trace-off inst)
-      'done)
-      (set! trace trace-off)
       (define (execute)
         (let ((insts (get-contents pc)))
           (if (null? insts)
@@ -116,7 +109,7 @@
               ((eq? message 'trace-on) (set! trace trace-on))
               ((eq? message 'trace-off) (set! trace trace-off))
               (else (error "Unknown request -- MACHINE" message))))
-      dispatch)))
+      dispatch))))
 
 (define (print x)
   (newline )
