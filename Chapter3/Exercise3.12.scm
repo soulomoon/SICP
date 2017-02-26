@@ -1,19 +1,19 @@
 ; Exercise 3.12: The following procedure for appending lists was introduced in 2.2.1:
-; (define (append x y)
-;   (if (null? x)
-;       y
-;       (cons (car x) (append (cdr x) y))))
+ (define (append x y)
+   (if (null? x)
+       y
+       (cons (car x) (append (cdr x) y))))
 ; Append forms a new list by successively consing the elements of x onto y. The procedure append! is similar to append, but it is a mutator rather than a constructor. It appends the lists by splicing them together, modifying the final pair of x so that its cdr is now y. (It is an error to call append! with an empty x.)
 
-; (define (append! x y)
-;   (set-cdr! (last-pair x) y)
-;   x)
+ (define (append! x y)
+   (set-cdr! (last-pair x) y)
+   x)
 ; Here last-pair is a procedure that returns the last pair in its argument:
 
-; (define (last-pair x)
-;   (if (null? (cdr x))
-;       x
-;       (last-pair (cdr x))))
+ (define (last-pair x)
+   (if (null? (cdr x))
+       x
+       (last-pair (cdr x))))
 ; Consider the interaction
 
 ; (define x (list 'a 'b))
@@ -50,7 +50,7 @@ y--->[*][*]---->[*][/]
 Z--->[*][*]---->[*][*]---->[*][*]---->[*][/]
       |          |          |          |
       v          v          v          v
-      'a         'b         'c         'd          
+      'a         'b         'c         'd
 
 
 (cdr x): [*][/]
@@ -58,18 +58,17 @@ Z--->[*][*]---->[*][*]---->[*][*]---->[*][/]
           v
           'b
 w-----+
-      |          
-      V          (cdr x) 
+      |
+      V          (cdr x)
 X--->[*][*]---->[*][*]
       |          |  |
       V          v  |
       'a         'b |
                     |
-      +-------------+      
+      +-------------+
       |
       v
 y--->[*][*]---->[*][/]
       |          |
       V          v
       'c         'd
-
