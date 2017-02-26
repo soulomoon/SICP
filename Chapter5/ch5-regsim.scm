@@ -403,6 +403,11 @@
   (if (pair? exp)
       (eq? (car exp) tag)
       false))
-
+      
+;; for printing
+(define (print x)
+  (newline )
+  (display x)
+  (newline ))
 (display '(REGISTER SIMULATOR LOADED))
 (newline )
