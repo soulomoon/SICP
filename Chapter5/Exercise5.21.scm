@@ -26,8 +26,6 @@
   (list
     (list 'cdr cdr)
     (list 'car car)
-    (list 'set-cdr! set-cdr!)
-    (list 'set-car! set-car!)
     (list 'pair? pair?)
     (list 'print print)
     (list '+ +)
@@ -87,12 +85,63 @@
   count-done
     (perform (op print) (reg val))
 )))
+
+(define count-leaves-machine2
+(make-machine
+  '(temp val n tree continue)
+  (list
+    (list 'cdr cdr)
+    (list 'car car)
+    (list 'pair? pair?)
+    (list 'print print)
+    (list '+ +)
+    (list 'null? null?)
+    (list 'not not))
+  '(
+    (assign n (const 0))
+    ;end-point with tree
+    (save tree)
+    (assign continue (label count-done))
+    (save continue)
+  count-iter
+    (test (op null?) (reg tree))
+    (branch (label answer0))
+    (assign temp (op pair?) (reg tree))
+    (test (op not) (reg temp))
+    (branch (label answer1))
+    ;split the trees, save the cdr-tree and set tree to car
+    (assign temp (op car) (reg tree))
+    (assign tree (op cdr) (reg tree))
+    (save tree)
+    (assign tree (reg temp))
+    ;leave label count-iter
+    (assign continue (label count-iter))
+    (save continue)
+    (goto (label count-iter))
+  answer0
+    (restore continue)
+    (restore tree)
+    (goto (reg continue))
+  answer1
+    (restore continue)
+    (restore tree)
+    (assign n (op +) (reg n) (const 1))
+    (goto (reg continue))
+  count-done
+    (perform (op print) (reg n))
+)))
 (define tree '((1 2) (1 2 3) 4 5))
 (set-register-contents! count-leaves-machine1 'tree tree)
 (start count-leaves-machine1)
+(set-register-contents! count-leaves-machine2 'tree tree)
+(start count-leaves-machine2)
 ;Welcome to DrRacket, version 6.8 [3m].
 ;Language: SICP (PLaneT 1.18); memory limit: 128 MB.
 ;(REGISTER SIMULATOR LOADED)
+;'done
+;
+;7
+;'done
 ;'done
 ;
 ;7
