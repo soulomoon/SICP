@@ -1,12 +1,37 @@
+; hack to evaluat one expression by in, or i to evaluat multible expressions
+
 ;;;; LOADS THE EXPLICIT-CONTROL EVALUATOR FROM SECTION 5.4 OF
 ;;;; STRUCTURE AND INTERPRETATION OF COMPUTER PROGRAMS, WITH
 ;;;; ALL THE SUPPORTING CODE IT NEEDS IN ORDER TO RUN.
 
 ;;;; **NB** The actual "load" calls are implementation dependent.
 
-(load "ch5-regsim.scm")			;reg machine simulator
+(load "/Users/soulomoon/git/SICP/material/allcode/ch5-regsim.scm")			;reg machine simulator
 
 ;; **NB** next file contains another "load"
-(load "ch5-eceval-support.scm")		;simulation of machine operations
+(load "/Users/soulomoon/git/SICP/material/allcode/ch5-eceval-support.scm")		;simulation of machine operations
 
-(load "ch5-eceval.scm")			;eceval itself
+(load "/Users/soulomoon/git/SICP/material/allcode/ch5-eceval.scm")			;eceval itself
+
+;eval machine is:
+;eceval
+
+
+; the register-name would be:
+;(exp env val proc argl continue unev)
+;(define (in exp)
+;  (set-register-contents! eceval 'exp exp)
+;  (start eceval)
+;  (newline )
+;  )
+;(define (i exps)
+;  (for-each (lambda (exp) (in exp)) exps))
+;(in '(+ 1 1))
+;(i '(
+;  (define a 1)
+;  (+ a 1)
+;  ))
+
+;(define (i . exp)
+;  (for-each (lambda ) i)
+;)

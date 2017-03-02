@@ -1,3 +1,6 @@
+; It have been hack to do one expression evaluation via "in" func
+
+
 ;;;;EXPLICIT-CONTROL EVALUATOR FROM SECTION 5.4 OF
 ;;;; STRUCTURE AND INTERPRETATION OF COMPUTER PROGRAMS
 
@@ -90,7 +93,8 @@ read-eval-print-loop
   (perform (op initialize-stack))
   (perform
    (op prompt-for-input) (const ";;; EC-Eval input:"))
-  (assign exp (op read))
+   (perform (op user-print) (reg exp))
+  ;(assign exp (op read))
   (assign env (op get-global-environment))
   (assign continue (label print-result))
   (goto (label eval-dispatch))
@@ -100,7 +104,7 @@ print-result
   (perform
    (op announce-output) (const ";;; EC-Eval value:"))
   (perform (op user-print) (reg val))
-  (goto (label read-eval-print-loop))
+  (goto (label end))
 
 unknown-expression-type
   (assign val (const unknown-expression-type-error))
@@ -113,7 +117,7 @@ unknown-procedure-type
 
 signal-error
   (perform (op user-print) (reg val))
-  (goto (label read-eval-print-loop))
+  (goto (label end))
 
 ;;SECTION 5.4.1
 eval-dispatch
@@ -196,7 +200,7 @@ ev-appl-accum-last-arg
 apply-dispatch
   (test (op primitive-procedure?) (reg proc))
   (branch (label primitive-apply))
-  (test (op compound-procedure?) (reg proc))  
+  (test (op compound-procedure?) (reg proc))
   (branch (label compound-apply))
   (goto (label unknown-procedure-type))
 
@@ -293,6 +297,7 @@ ev-definition-1
    (op define-variable!) (reg unev) (reg val) (reg env))
   (assign val (const ok))
   (goto (reg continue))
+end
    )))
 
 '(EXPLICIT CONTROL EVALUATOR LOADED)
