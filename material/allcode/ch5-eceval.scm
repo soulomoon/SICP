@@ -29,7 +29,7 @@
 (define (user-print a)
   (if (not (equal? a 'ok))
     (begin
-      ;(newline )
+      (newline )
       (display "λ> ")
       (display a))))
 

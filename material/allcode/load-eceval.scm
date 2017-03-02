@@ -22,9 +22,11 @@
 (define (in exp)
   (set-register-contents! eceval 'exp exp)
   (start eceval)
-  (newline )
   )
 (define (i exps)
+  (newline )
+  (newline )
+  (display "INTERPRETATION:")
   (for-each (lambda (exp) (in exp)) exps))
 ;(in '(+ 1 1))
 ;(i '(
