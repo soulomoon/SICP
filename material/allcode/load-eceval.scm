@@ -19,13 +19,13 @@
 
 ; the register-name would be:
 ;(exp env val proc argl continue unev)
-;(define (in exp)
-;  (set-register-contents! eceval 'exp exp)
-;  (start eceval)
-;  (newline )
-;  )
-;(define (i exps)
-;  (for-each (lambda (exp) (in exp)) exps))
+(define (in exp)
+  (set-register-contents! eceval 'exp exp)
+  (start eceval)
+  (newline )
+  )
+(define (i exps)
+  (for-each (lambda (exp) (in exp)) exps))
 ;(in '(+ 1 1))
 ;(i '(
 ;  (define a 1)
