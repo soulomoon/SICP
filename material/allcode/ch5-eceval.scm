@@ -25,6 +25,14 @@
 ;; print-result in the machine controller below
 ;;**Also choose the desired make-stack version in regsim.scm
 
+;;;;;;;better printing
+(define (user-print a)
+  (if (not (equal? a 'ok))
+    (begin
+      ;(newline )
+      (display "λ> ")
+      (display a))))
+
 (define eceval-operations
   (list
    ;;primitive Scheme operations
