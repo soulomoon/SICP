@@ -1,9 +1,13 @@
+;it have been hack to open the-global-environment
+
+
+
 ;;;;SIMULATION OF ECEVAL MACHINE OPERATIONS --
 ;;;;loaded by load-eceval.scm and by load-eceval-compiler.scm
 
 ;;;;FIRST A LOT FROM 4.1.2-4.1.4
 
-(load "ch5-syntax.scm");               ;section 4.1.2 syntax procedures
+(load "/Users/soulomoon/git/SICP/material/allcode/ch5-syntax.scm");               ;section 4.1.2 syntax procedures
 
 ;;;SECTION 4.1.3
 ;;; operations used by compiled code and eceval except as noted
@@ -172,7 +176,7 @@
 (define (get-global-environment)
   the-global-environment)
 ;; will do following when ready to run, not when load this file
-;;(define the-global-environment (setup-environment))
+(define the-global-environment (setup-environment))
 
 
 ;;; Simulation of new machine operations needed for compiled code
@@ -184,4 +188,3 @@
   (tagged-list? proc 'compiled-procedure))
 (define (compiled-procedure-entry c-proc) (cadr c-proc))
 (define (compiled-procedure-env c-proc) (caddr c-proc))
-
