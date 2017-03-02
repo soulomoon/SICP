@@ -4,9 +4,9 @@
 
 ;;;; **NB** The actual "load" calls are implementation dependent.
 
-(load "ch5-regsim")			;reg machine simulator
+(load "ch5-regsim.scm")			;reg machine simulator
 
 ;; **NB** next file contains another "load"
-(load "ch5-eceval-support")		;simulation of machine operations
+(load "ch5-eceval-support.scm")		;simulation of machine operations
 
-(load "ch5-eceval")			;eceval itself
+(load "ch5-eceval.scm")			;eceval itself
