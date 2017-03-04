@@ -33,6 +33,35 @@
           (scan (frame-variables frame)
                 (frame-values frame)))))
   (env-loop env))
+
+
+  ;divided by zero erro
+(define (/e a b)
+  (if (= 0 b)
+      (list 'error "divided by zero")
+      (/ a b)))
+
+(define (car/e obj)
+  (if (not (pair? obj))
+      (list 'error "not caring pair")
+      (car obj)))
+
+(define primitive-procedures
+  (list (list 'car car/e)
+        (list 'cdr cdr)
+        (list 'cons cons)
+        (list 'null? null?)
+	;;above from book -- here are some more
+  (list 'display display)
+	(list '+ +)
+	(list '- -)
+	(list '* *)
+	(list '= =)
+	(list '/ /e)
+	(list '> >)
+	(list '< <)
+        ))
+
 (define eceval-operations
   (list
    ;;primitive Scheme operations
@@ -94,8 +123,12 @@
   (append
     eceval-operations
     (list (list 'equal? equal?))
+    (list (list 'cadr cadr))
+    (list (list 'tagged-list? tagged-list?))
     (list (list 'member member))
 ))
+
+(define the-global-environment (setup-environment))
 (define eceval
   (make-machine
    '(exp env val proc argl continue unev)
@@ -126,6 +159,10 @@ unknown-expression-type
 unknown-procedure-type
   (restore continue)
   (assign val (const unknown-procedure-type-error))
+  (goto (label signal-error))
+
+primitive-erro
+  (assign val (op cadr) (reg val))
   (goto (label signal-error))
 
 signal-error
@@ -223,6 +260,8 @@ primitive-apply
   (assign val (op apply-primitive-procedure)
               (reg proc)
               (reg argl))
+  (test (op tagged-list?) (reg val) (const 'error))
+  (branch (label primitive-erro))
   (restore continue)
   (goto (reg continue))
 
@@ -325,5 +364,6 @@ a
       n
       (+ (fib (- n 1)) (fib (- n 2)))))
 (fib 1)
-
+(/ 0 0)
+(car 1)
 ))
