@@ -121,6 +121,7 @@
         (list 'cons cons)
         (list 'null? null?)
 	;;above from book -- here are some more
+  (list 'display display)
 	(list '+ +)
 	(list '- -)
 	(list '* *)
