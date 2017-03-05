@@ -24,8 +24,9 @@ save and restore proc
 none
 
 ((f) 'x 'y) need:
+none
 
-(f (g 'x) 'y) need:
+(f (g 'x) y) need:
 operator(not the last):
 save and restore env
 save and restore argl
@@ -33,7 +34,6 @@ save and restore proc
 
 (f (g 'x) 'y):
 operator(not the last):
-save and restore env
 save and restore argl
 save and restore proc
 ```
