@@ -24,8 +24,6 @@ save and restore proc
 none
 
 ((f) 'x 'y) need:
-operator:
-save and restore env
 
 (f (g 'x) 'y) need:
 operator(not the last):
