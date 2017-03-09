@@ -6,6 +6,15 @@
 ;      (* n (factorial-alt (- n 1)))))
 ;Compile this procedure and compare the resulting code with that produced for factorial. Explain any differences you find. Does either program execute more efficiently than the other?
 
+;the only different is from (* n (factorial (- n 1)))
+;  to (* (factorial (- n 1)) n)
+;
+;mostly the same, when compiling arglist see below,
+;the different is that when construct-arglist is called, the last arg is a call to itself or just n,
+;if the the last arg is n, since it would not chang env, so it would not save env here, but when it the last is another call, env would be saved
+;but when code-to-get-last-arg is called, the saving and not saving is reversed,
+;just in another register which is argl, since a call to factorial would modifies it and n won't
+; so they have the same stack deep and operation.
 (load "/Users/soulomoon/git/SICP/material/allcode/ch5-compiler.scm")
 (load "/Users/soulomoon/git/SICP/material/allcode/load-eceval.scm")
 (define (print a)
@@ -133,15 +142,7 @@
 (eceval2 'count)
 ((eceval2 'stack) 'print-statistics)
 
-;the only different is from (* n (factorial (- n 1)))
-;  to (* (factorial (- n 1)) n)
-;
-;mostly the same, when compiling arglist see below,
-;the different is that when construct-arglist is called, the last arg is a call to itself or just n,
-;if the the last arg is n, since it would not chang env, so it would not save env here, but when it the last is another call, env would be saved
-;but when code-to-get-last-arg is called, the saving and not saving is reversed,
-;just in another register which is argl, since a call to factorial would modifies it and n won't
-; so they have the same stack deep and operation.
+
 (define (construct-arglist operand-codes)
   (let ((operand-codes
          (reverse operand-codes)))
