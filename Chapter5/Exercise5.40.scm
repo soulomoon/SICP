@@ -4,12 +4,14 @@
 ;;include lexical-address operation from previous practice
 (load "/Users/soulomoon/git/SICP/Chapter5/Exercise5.39.scm")
 
-  
+(define (empty-compile-time-env) '())
+(define (extend-compile-time-environment formals env) (cons formals env))
+
 ;this take alot of work - -///
 
 (define (compile-lambda-body exp proc-entry ct-env)
   (let* ((formals (lambda-parameters exp))
-        (ct-env (extend-environment formals formals ct-env)))
+        (ct-env (extend-compile-time-environment formals ct-env)))
     (append-instruction-sequences
      (make-instruction-sequence '(env proc argl) '(env)
       `(,proc-entry
