@@ -5,7 +5,7 @@
 (load "/Users/soulomoon/git/SICP/Chapter5/Exercise5.39.scm")
 
 (define (empty-compile-time-env) '())
-(define (extend-compile-time-environment formals env) (cons formals env))
+(define (extend-compile-time-environment vars env) (cons vars env))
 
 ;this take alot of work - -///
 
