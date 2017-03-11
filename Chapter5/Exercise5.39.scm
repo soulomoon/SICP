@@ -1,6 +1,6 @@
 ;Exercise 5.39: Write a procedure lexical-address-lookup that implements the new lookup operation. It should take two arguments—a lexical address and a run-time environment—and return the value of the variable stored at the specified lexical address. Lexical-address-lookup should signal an error if the value of the variable is the symbol *unassigned*.331 Also write a procedure lexical-address-set! that implements the operation that changes the value of the variable at a specified lexical address.
 (load "/Users/soulomoon/git/SICP/material/allcode/ch5-eceval-support.scm")
-
+; implement list-set! get-lexical-frame get-lexical-value as helper function
 (define (list-set! lst pos value)
   (define (iter l n)
     (cond
@@ -9,20 +9,20 @@
       (else (iter (cdr l) (- n 1)))))
   (iter lst pos))
 
-(define (get-frame n e)
+(define (get-lexical-frame n e)
   (cond
     ((eq? e the-empty-environment) (error "getframe: frame-number overflow"))
     ((= n 0) (first-frame e))
-    (else (get-frame (- n 1) (enclosing-environment e)))))
+    (else (get-lexical-frame (- n 1) (enclosing-environment e)))))
 
-(define (get-value n frame)
+(define (get-lexical-value n frame)
     (list-ref (frame-values frame) n))
 
 (define (lexical-address-lookup l-address r-env)
   (let* ((frame-number (car l-address))
         (displacement-number (cdr l-address))
-        (frame (get-frame frame-number r-env))
-        (val (get-value displacement-number frame)))
+        (frame (get-lexical-frame frame-number r-env))
+        (val (get-lexical-value displacement-number frame)))
       (if (equal? "*unassigned*" val)
           (error "lexical-address-lookup *unassigned*:" l-address)
           val)))
@@ -30,7 +30,7 @@
 (define (lexical-address-set! l-address r-env value)
   (let* ((frame-number (car l-address))
         (displacement-number (cdr l-address))
-        (frame (get-frame frame-number r-env)))
+        (frame (get-lexical-frame frame-number r-env)))
       (list-set! (frame-values frame) displacement-number value)))
 
 
