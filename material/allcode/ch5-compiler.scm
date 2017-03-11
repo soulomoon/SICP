@@ -376,5 +376,7 @@
    (list-union (registers-modified seq1)
                (registers-modified seq2))
    (append (statements seq1) (statements seq2))))
-
+(define (print-statements s)
+  (for-each (lambda (x) (display x) (newline ))
+    (statements s)))
 '(COMPILER LOADED)
