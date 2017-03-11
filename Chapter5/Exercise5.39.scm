@@ -35,42 +35,42 @@
 
 
 ;;;;;;;test;;;;;;;;;
-(define avariables
-  '(a b c d e))
-(define avalues
-  '(1 2 3 4 5))
-(define initial-env
-  (extend-environment avariables avalues the-empty-environment))
+;(define avariables
+;  '(a b c d e))
+;(define avalues
+;  '(1 2 3 4 5))
+;(define initial-env
+;  (extend-environment avariables avalues the-empty-environment))
+;
+;(define a avariables)
+;(set! avariables avalues)
+;(set! avalues a)
+;
+;(define new-env
+;  (extend-environment avariables avalues initial-env))
+;
+;(define (test n)
+;  (for-each
+;    (lambda (x) (display x) (newline ))
+;    (list
+;      (lexical-address-lookup (cons n n) new-env)
+;      (lexical-address-lookup (cons n 0) new-env)
+;      (lexical-address-lookup (cons 0 n) new-env)
+;      (lexical-address-lookup (cons 0 0) new-env))))
+;(define (test2 n)
+;  (for-each
+;    (lambda (x) (display x) (newline ))
+;    (list
+;      (lexical-address-set! (cons n n) new-env "new")
+;      (lexical-address-set! (cons n 0) new-env "new")
+;      (lexical-address-set! (cons 0 n) new-env "new")
+;      (lexical-address-set! (cons 0 0) new-env "new"))))
 
-(define a avariables)
-(set! avariables avalues)
-(set! avalues a)
-
-(define new-env
-  (extend-environment avariables avalues initial-env))
-
-(define (test n)
-  (for-each
-    (lambda (x) (display x) (newline ))
-    (list
-      (lexical-address-lookup (cons n n) new-env)
-      (lexical-address-lookup (cons n 0) new-env)
-      (lexical-address-lookup (cons 0 n) new-env)
-      (lexical-address-lookup (cons 0 0) new-env))))
-(define (test2 n)
-  (for-each
-    (lambda (x) (display x) (newline ))
-    (list
-      (lexical-address-set! (cons n n) new-env "new")
-      (lexical-address-set! (cons n 0) new-env "new")
-      (lexical-address-set! (cons 0 n) new-env "new")
-      (lexical-address-set! (cons 0 0) new-env "new"))))
-
-(test 1)
-(test2 1)
-(test 1)
-
-(lexical-address-set! (cons 0 100) new-env "new")
+;(test 1)
+;(test2 1)
+;(test 1)
+;
+;(lexical-address-set! (cons 0 100) new-env "new")
 
 ;Welcome to DrRacket, version 6.8 [3m].
 ;Language: SICP (PLaneT 1.18); memory limit: 128 MB.

@@ -17,7 +17,6 @@
       ((null? frame) false)
       ((equal? val (car frame)) n)
       (else (iter-var (cdr frame) (+ n 1)))))
-
   (define (iter ev n)
     (if (null? ev)
         'not-found
@@ -29,16 +28,16 @@
                   (cons n var-pos)
                   (iter tail (+ n 1))))))
   (iter env 0))
-(find-variable
- 'c '((y z) (a b c d e) (x y)))
-;(1 2)
-
-(find-variable
- 'x '((y z) (a b c d e) (x y)))
-;(2 0)
-
-(find-variable
- 'w '((y z) (a b c d e) (x y)))
+;(find-variable
+; 'c '((y z) (a b c d e) (x y)))
+;;(1 2)
+;
+;(find-variable
+; 'x '((y z) (a b c d e) (x y)))
+;;(2 0)
+;
+;(find-variable
+; 'w '((y z) (a b c d e) (x y)))
 ;not-found
 
 ;Welcome to DrRacket, version 6.8 [3m].

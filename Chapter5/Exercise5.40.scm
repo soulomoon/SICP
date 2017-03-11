@@ -156,9 +156,9 @@
 ;;;combinations
 
 (define (compile-application exp target linkage ct-env)
-  (let ((proc-code (compile (operator exp) 'proc 'next) ct-env)
+  (let ((proc-code (compile (operator exp) 'proc 'next ct-env))
         (operand-codes
-         (map (lambda (operand) (compile operand 'val 'next) ct-env)
+         (map (lambda (operand) (compile operand 'val 'next ct-env))
               (operands exp))))
     (preserving '(env continue)
      proc-code
