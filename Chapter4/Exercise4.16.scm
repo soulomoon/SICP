@@ -28,7 +28,8 @@
 (define (scan-out-defines body)
   (define (notdefinition? exp) (not (definition? exp)))
   (define (filter l predict?)
-    (let ((returns '()))
+    (let ((returns '())
+          (l (reverse l)))
          (define (iter l)
             (if (null? l)
                 returns
@@ -37,46 +38,49 @@
                       (set! returns (cons (car l) returns))                   (iter (cdr l)) )
                     (iter (cdr l)))))
           (iter l)))
-  (define (make-the-let-body defines notdefines)
-    (if defines
-        (make-the-let-body
-          (cdr defines)
-          (cons
-            (list 'set!
-                  (definition-variable (car defines))
-                  (definition-value (car defines)))
-            notdefines))
-        notdefines))
-  (define (defines) (filter body definition?))
-  (define (notdefines) (filter body notdefinition?))
-  (display (defines))(newline )
-  (if (defines)
-      body
-      (make-let
-        (map
-          (lambda (exp)
-                  (list (definition-variable exp) '*unassigned*))
-          (defines))
-          (make-the-let-body (defines) (notdefines)))))
+  (let ((defines (filter body definition?))
+        (notdefines (filter body notdefinition?)))
+        (if (not defines)
+            body
+            (list
+              (apply
+                make-let
+                  (cons
+                    (map
+                      (lambda (exp)
+                              (list (definition-variable exp) "*unassigned*"))
+                      defines)
+                    (append
+                      (map
+                        (lambda (d)
+                          (list 'set!
+                                (definition-variable d)
+                                (definition-value d)))
+                         defines)
+                       notdefines)))))))
 
 (define (make-procedure parameters body env)
+  (display "make-procedure: ")
+  (display (scan-out-defines body))(newline )
+  ;(display (lookup-variable-value 'b env))(newline )
   (list 'procedure parameters (scan-out-defines body) env))
 
 
 
-; it is better to install in the make-procedure otherwise you have to do the transformation every time the procedure is called
-;(interpret 
-;'(begin
-;  (define (test)
-;  (define b 2)
-;  (define (c) 3)
-;  (+ b (c)))
-;(test))
-;)
-; Welcome to DrRacket, version 6.7 [3m].
-; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
-; 'ok
-; ((define (c) 3) (define b 2))
-; ()
-; 5
-; >
+ ;it is better to install in the make-procedure otherwise you have to do the transformation every time the procedure is called
+(interpret
+'(begin
+  (define (test)
+  (define b 2)
+  (define (c) 3)
+  (+ b (c)))
+(test))
+)
+;Welcome to DrRacket, version 6.8 [3m].
+;Language: SICP (PLaneT 1.18); memory limit: 128 MB.
+;'ok
+;make-procedure: ((let ((b *unassigned*) (c *unassigned*)) (set! b 2) (set! c (lambda () 3)) (+ b (c))))
+;make-procedure: ((let () (set! b 2) (set! c (lambda () 3)) (+ b (c))))
+;make-procedure: ((let () 3))
+;5
+;> 
