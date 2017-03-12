@@ -15,7 +15,7 @@
 
 ;eval machine is:
 ;eceval
-
+(define (print x) (display x) (newline ))
 
 ; the register-name would be:
 ;(exp env val proc argl continue unev)
