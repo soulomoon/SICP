@@ -13,15 +13,21 @@
     (set-register-contents! eceval 'flag true)
     (set-register-contents! eceval 'extra in-exp)
     (start eceval)))
+(define (ev-print x)
+  (display "λ > ")
+  (display x)
+  (newline ))
 
 (set! eceval-operations
   (append
     eceval-operations
     (list
+      (list 'ev-print ev-print)
+      (list 'eq? eq?)
       (list 'null? null?)
       (list 'car car)
       (list 'cdr cdr))))
-      
+
 (define eceval
   (make-machine
     ;;;;extra to hold the the ones about to be interpret
@@ -37,25 +43,31 @@
   (branch (label external-entry))
 read-eval-print-loop
   (perform (op initialize-stack))
-  (perform
-   (op prompt-for-input) (const ";;; EC-Eval input:"))
+  (perform (op prompt-for-input) (const ";;; EC-Eval input:"))
 ;;;;if there is nothing go to the end
   (test (op null?) (reg extra))
   (branch (label ev-end))
 ;;;;;eval the current
   (assign exp (op car) (reg extra))
+  (perform (op ev-print) (reg exp))
+
   (assign extra (op cdr) (reg extra))
 
   (assign env (op get-global-environment))
   (assign continue (label print-result))
   (goto (label eval-dispatch))
 print-result
+;;**test if it is 'ok if so , skip it
+  (test (op eq?) (const ok) (reg val))
+  (branch (label skip-point))
 ;;**following instruction optional -- if use it, need monitored stack
   (perform (op print-stack-statistics))
   (perform
    (op announce-output) (const ";;; EC-Eval value:"))
   (perform (op user-print) (reg val))
-;;;;;;;;end it
+
+;;;;;;;;skip point
+skip-point
   (goto (label read-eval-print-loop))
 
 ;;*support for entry from compiler (from section 5.5.7)
