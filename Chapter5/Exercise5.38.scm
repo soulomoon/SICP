@@ -97,54 +97,54 @@
     (statements s)))
 
 ;; 3 it actually getting a much smaller compiled code, it don't even need to save anthing
-(print-statements
-  (compile
-    '(define (factorial-alt n)
-      (if (= n 1)
-          1
-          (* (factorial-alt (- n 1)) n)))
-
-    'val 'next))
-(newline )
-(define a
-  (compile
-    '(begin
-        (define (factorial-alt n)
-          (if (= n 1)
-              1
-              (* (factorial-alt (- n 1)) n)))
-
-        (factorial-alt 101)
-      ) 'val 'next))
-
-(set! a
-  (append
-    '((assign env (op get-global-environment)))
-  (statements a)))
-(set! a (append a '((perform (op user-print) (reg val)))))
-(set! eceval-operations
-  (append
-    eceval-operations
-    (list
-      (list 'make-compiled-procedure make-compiled-procedure)
-      (list 'compiled-procedure-env compiled-procedure-env)
-      (list 'compiled-procedure-entry compiled-procedure-entry)
-      (list 'list list)
-      (list 'cons cons)
-      (list '- -)
-      (list '= =)
-      (list 'false? false?)
-      (list '* *))))
-(define eceval
-  (make-machine
-   '(env val proc argl arg1 arg2 continue)
-   eceval-operations
-   a
-   ))
-(start eceval)
-((eceval 'stack) 'print-statistics)
-(start eceval)
-((eceval 'stack) 'print-statistics)
+;(print-statements
+;  (compile
+;    '(define (factorial-alt n)
+;      (if (= n 1)
+;          1
+;          (* (factorial-alt (- n 1)) n)))
+;
+;    'val 'next))
+;(newline )
+;(define a
+;  (compile
+;    '(begin
+;        (define (factorial-alt n)
+;          (if (= n 1)
+;              1
+;              (* (factorial-alt (- n 1)) n)))
+;
+;        (factorial-alt 101)
+;      ) 'val 'next))
+;
+;(set! a
+;  (append
+;    '((assign env (op get-global-environment)))
+;  (statements a)))
+;(set! a (append a '((perform (op user-print) (reg val)))))
+;(set! eceval-operations
+;  (append
+;    eceval-operations
+;    (list
+;      (list 'make-compiled-procedure make-compiled-procedure)
+;      (list 'compiled-procedure-env compiled-procedure-env)
+;      (list 'compiled-procedure-entry compiled-procedure-entry)
+;      (list 'list list)
+;      (list 'cons cons)
+;      (list '- -)
+;      (list '= =)
+;      (list 'false? false?)
+;      (list '* *))))
+;(define eceval
+;  (make-machine
+;   '(env val proc argl arg1 arg2 continue)
+;   eceval-operations
+;   a
+;   ))
+;(start eceval)
+;((eceval 'stack) 'print-statistics)
+;(start eceval)
+;((eceval 'stack) 'print-statistics)
 
 ; 4 This is the syntax transferation for no more than two operands
 (define (open-coded-trans exp)
@@ -156,7 +156,8 @@
           (cons op (list (car arlist) (iter (cdr arlist))))))
     (iter args)))
 
-(display (open-coded-trans '(+ 1 1 1 1)))
+;(display (open-coded-trans '(+ 1 1 1 1)))
+
 ;λ> (assign val (op make-compiled-procedure) (label entry1) (reg env))
 ;λ> (goto (label after-lambda2))
 ;λ> entry1

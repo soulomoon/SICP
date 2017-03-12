@@ -92,53 +92,53 @@
                       (reg env))
              (assign ,target (const ok)))))))))
 
-(define x
-'(((lambda (x y)
-   (lambda (a b c d e)
-     ((lambda (y z) (* x y z))
-      (* a b x)
-      (+ c d x))))
- 3
- 4) 1 1 1 1 1))
-
-(set! eceval-operations
-  (append
-    eceval-operations
-    (list
-      (list 'make-compiled-procedure make-compiled-procedure)
-      (list 'compiled-procedure-env compiled-procedure-env)
-      (list 'compiled-procedure-entry compiled-procedure-entry)
-      (list 'list list)
-      (list 'cons cons)
-      (list 'false? false?)
-      (list 'lexical-address-lookup lexical-address-lookup)
-      )))
-
-
-  (define a
-    (compile
-      x
-      'val
-      'next
-      (empty-compile-time-env)))
-      ;(print-statements a)
-  (set! a
-    (append
-      '((assign env (op get-global-environment)))
-    (statements a)))
-  (set! a (append a '((perform (op user-print) (reg val)))))
-  (newline )
-  (newline )
-  (newline )
-  (newline )
-  (define eceval
-    (make-machine
-     '(env val proc argl continue)
-     eceval-operations
-     a
-     ))
-  (start eceval)
-  ((eceval 'stack) 'print-statistics)
+;(define x
+;'(((lambda (x y)
+;   (lambda (a b c d e)
+;     ((lambda (y z) (* x y z))
+;      (* a b x)
+;      (+ c d x))))
+; 3
+; 4) 1 1 1 1 1))
+;
+;(set! eceval-operations
+;  (append
+;    eceval-operations
+;    (list
+;      (list 'make-compiled-procedure make-compiled-procedure)
+;      (list 'compiled-procedure-env compiled-procedure-env)
+;      (list 'compiled-procedure-entry compiled-procedure-entry)
+;      (list 'list list)
+;      (list 'cons cons)
+;      (list 'false? false?)
+;      (list 'lexical-address-lookup lexical-address-lookup)
+;      )))
+;
+;
+;  (define a
+;    (compile
+;      x
+;      'val
+;      'next
+;      (empty-compile-time-env)))
+;      ;(print-statements a)
+;  (set! a
+;    (append
+;      '((assign env (op get-global-environment)))
+;    (statements a)))
+;  (set! a (append a '((perform (op user-print) (reg val)))))
+;  (newline )
+;  (newline )
+;  (newline )
+;  (newline )
+;  (define eceval
+;    (make-machine
+;     '(env val proc argl continue)
+;     eceval-operations
+;     a
+;     ))
+;  (start eceval)
+;  ((eceval 'stack) 'print-statistics)
 
 ;  Welcome to DrRacket, version 6.8 [3m].
 ;Language: SICP (PLaneT 1.18); memory limit: 128 MB.
