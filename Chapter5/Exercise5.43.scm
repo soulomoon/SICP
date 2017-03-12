@@ -17,7 +17,7 @@
 (load "/Users/soulomoon/git/SICP/Chapter5/Exercise5.42.scm")
 
 (define (scan-out-defines body)
-  (print "scan-out-defines is on")
+  ;(print "scan-out-defines is on")
   (define (notdefinition? exp) (not (definition? exp)))
   (define (filter l predict?)
     (let ((returns '()))
@@ -53,9 +53,8 @@
             (make-the-let-body (defines) (notdefines))))))
 
 (define (compile-lambda-body exp proc-entry ct-env)
-  ;(newline )
-  ;(display "new")
-  (let ((formals (lambda-parameters exp)))
+  (let* ((formals (lambda-parameters exp))
+        (ct-env (extend-compile-time-environment formals ct-env)))
     (append-instruction-sequences
      (make-instruction-sequence '(env proc argl) '(env)
       `(,proc-entry
@@ -65,51 +64,49 @@
                 (const ,formals)
                 (reg argl)
                 (reg env))))
-      ; a macro transformation from define to let to lambda, nesty!
      (compile-sequence (scan-out-defines (lambda-body exp)) 'val 'return ct-env))))
 
 
-
-(define x
-'(begin
-  (define (test)
-    (define b 2)
-    (define (c) 3)
-    (+ b (c)))
-(test)))
-
-(set! eceval-operations
-  (append
-    eceval-operations
-    (list
-      (list 'make-compiled-procedure make-compiled-procedure)
-      (list 'compiled-procedure-env compiled-procedure-env)
-      (list 'compiled-procedure-entry compiled-procedure-entry)
-      (list 'list list)
-      (list 'cons cons)
-      (list 'false? false?)
-      )))
-(define a
-  (compile
-    x
-    'val
-    'next
-    (empty-compile-time-env)
-    ))
-
-(set! a
-  (append
-    '((assign env (op get-global-environment)))
-  (statements a)))
-(set! a (append a '((perform (op user-print) (reg val)))))
-
-(define eceval
-    (make-machine
-   '(env val proc argl continue)
-   eceval-operations
-   a
-   ))
-(start eceval)
+;(define x
+;'(begin
+;  (define (test)
+;    (define b 2)
+;    (define (c) 3)
+;    (+ b (c)))
+;(test)))
+;
+;(set! eceval-operations
+;  (append
+;    eceval-operations
+;    (list
+;      (list 'make-compiled-procedure make-compiled-procedure)
+;      (list 'compiled-procedure-env compiled-procedure-env)
+;      (list 'compiled-procedure-entry compiled-procedure-entry)
+;      (list 'list list)
+;      (list 'cons cons)
+;      (list 'false? false?)
+;      )))
+;(define a
+;  (compile
+;    x
+;    'val
+;    'next
+;    (empty-compile-time-env)
+;    ))
+;
+;(set! a
+;  (append
+;    '((assign env (op get-global-environment)))
+;  (statements a)))
+;(set! a (append a '((perform (op user-print) (reg val)))))
+;
+;(define eceval
+;    (make-machine
+;   '(env val proc argl continue)
+;   eceval-operations
+;   a
+;   ))
+;(start eceval)
 
 ;Welcome to DrRacket, version 6.8 [3m].
 ;Language: SICP (PLaneT 1.18); memory limit: 128 MB.
