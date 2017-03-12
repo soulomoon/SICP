@@ -12,8 +12,9 @@
 ;using scan-out-defines, it would transform it into a let expression if there is definition, so here we need to make a little change that , we have to transform the let into a lambda, since it is not implementing in the compiler
 
 (load "/Users/soulomoon/git/SICP/Chapter4/Exercise4.16.scm")
-(load "/Users/soulomoon/git/SICP/material/allcode/load-eceval.scm")
-(load "/Users/soulomoon/git/SICP/material/allcode/ch5-compiler.scm")
+;(load "/Users/soulomoon/git/SICP/material/allcode/load-eceval.scm")
+;(load "/Users/soulomoon/git/SICP/material/allcode/ch5-compiler.scm")
+(load "/Users/soulomoon/git/SICP/Chapter5/Exercise5.42.scm")
 
 (define (scan-out-defines body)
   (print "scan-out-defines is on")
@@ -51,7 +52,7 @@
             (defines))
             (make-the-let-body (defines) (notdefines))))))
 
-(define (compile-lambda-body exp proc-entry)
+(define (compile-lambda-body exp proc-entry ct-env)
   ;(newline )
   ;(display "new")
   (let ((formals (lambda-parameters exp)))
@@ -65,7 +66,7 @@
                 (reg argl)
                 (reg env))))
       ; a macro transformation from define to let to lambda, nesty!
-     (compile-sequence (scan-out-defines (lambda-body exp)) 'val 'return))))
+     (compile-sequence (scan-out-defines (lambda-body exp)) 'val 'return ct-env))))
 
 
 
@@ -93,6 +94,7 @@
     x
     'val
     'next
+    (empty-compile-time-env)
     ))
 
 (set! a
