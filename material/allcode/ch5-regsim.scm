@@ -18,7 +18,7 @@
     (for-each (lambda (register-name)
                 ((machine 'allocate-register) register-name))
               register-names)
-    ((machine 'install-operations) ops)    
+    ((machine 'install-operations) ops)
     ((machine 'install-instruction-sequence)
      (assemble controller-text machine))
     machine))
@@ -84,7 +84,7 @@
           (let ((top (car s)))
             (set! s (cdr s))
             (set! current-depth (- current-depth 1))
-            top)))    
+            top)))
     (define (initialize)
       (set! s '())
       (set! number-pushes 0)
@@ -195,7 +195,7 @@
         (ops (machine 'operations)))
     (for-each
      (lambda (inst)
-       (set-instruction-execution-proc! 
+       (set-instruction-execution-proc!
         inst
         (make-execution-procedure
          (instruction-text inst) labels machine
@@ -327,7 +327,7 @@
   (let ((reg (get-register machine
                            (stack-inst-reg-name inst))))
     (lambda ()
-      (set-contents! reg (pop stack))    
+      (set-contents! reg (pop stack))
       (advance-pc pc))))
 
 (define (stack-inst-reg-name stack-instruction)
@@ -404,4 +404,4 @@
       (eq? (car exp) tag)
       false))
 
-'(REGISTER SIMULATOR LOADED)
+(display '(REGISTER SIMULATOR LOADED))(newline )

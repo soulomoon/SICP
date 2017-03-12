@@ -259,10 +259,10 @@ ev-appl-accum-last-arg
 apply-dispatch
   (test (op primitive-procedure?) (reg proc))
   (branch (label primitive-apply))
-  (test (op compound-procedure?) (reg proc))  
+  (test (op compound-procedure?) (reg proc))
   (branch (label compound-apply))
 ;;*next added to call compiled code from evaluator (section 5.5.7)
-  (test (op compiled-procedure?) (reg proc))  
+  (test (op compiled-procedure?) (reg proc))
   (branch (label compiled-apply))
   (goto (label unknown-procedure-type))
 
@@ -367,4 +367,4 @@ ev-definition-1
   (goto (reg continue))
    )))
 
-'(EXPLICIT CONTROL EVALUATOR FOR COMPILER LOADED)
+(display '(EXPLICIT CONTROL EVALUATOR FOR COMPILER LOADED))(newline )
