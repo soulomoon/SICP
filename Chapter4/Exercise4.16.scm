@@ -60,22 +60,22 @@
                        notdefines)))))))
 
 (define (make-procedure parameters body env)
-  (display "make-procedure: ")
-  (display (scan-out-defines body))(newline )
+  ;(display "make-procedure: ")
+  ;(display (scan-out-defines body))(newline )
   ;(display (lookup-variable-value 'b env))(newline )
   (list 'procedure parameters (scan-out-defines body) env))
 
 
 
  ;it is better to install in the make-procedure otherwise you have to do the transformation every time the procedure is called
-(interpret
-'(begin
-  (define (test)
-  (define b 2)
-  (define (c) 3)
-  (+ b (c)))
-(test))
-)
+;(interpret
+;'(begin
+;  (define (test)
+;  (define b 2)
+;  (define (c) 3)
+;  (+ b (c)))
+;(test))
+;)
 ;Welcome to DrRacket, version 6.8 [3m].
 ;Language: SICP (PLaneT 1.18); memory limit: 128 MB.
 ;'ok
@@ -83,4 +83,4 @@
 ;make-procedure: ((let () (set! b 2) (set! c (lambda () 3)) (+ b (c))))
 ;make-procedure: ((let () 3))
 ;5
-;> 
+;>

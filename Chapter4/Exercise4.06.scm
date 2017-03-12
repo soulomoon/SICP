@@ -15,7 +15,7 @@
 (define (let-empty-pairs? exp)
   ; (display (cadr exp))
   (null? (cadr exp)))
-  
+
 (define (let-body exp)
   (cddr exp))
 (define (let-pa-pairs exp)
@@ -24,7 +24,7 @@
   (map car (let-pa-pairs exp)))
 (define (let-arguments exp)
   (map cadr (let-pa-pairs exp)))
-  
+
 (define (let->combination exp)
   ; (display (make-lambda (let-parameters exp) (let-body exp)))
   (if (let-empty-pairs? exp)
@@ -33,7 +33,7 @@
           (let-arguments exp))))
 
 (define (eval-let exp env)
-(display (let->combination exp))(newline )
+;(display (let->combination exp))(newline )
   (eval# (let->combination exp) env))
 
 (define (make-let pairs . body)
@@ -49,7 +49,7 @@
 ;         (if x y)))
 ; (interpret
 ;   '(let ((x 2))
-;     (let 
+;     (let
 ;         ((y 3))
 ;         (if y x))))
 
@@ -65,4 +65,4 @@
 ; ((lambda (x) (let ((y 3)) (if y x))) 2)((lambda (y) (if y x)) 3)2
 ; (if 1 1)1
 ; ((lambda (x y) (if 1 1) (if x y)) 2 3)3
-; > 
+; >
