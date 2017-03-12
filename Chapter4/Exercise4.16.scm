@@ -33,17 +33,17 @@
             (if (null? l)
                 returns
                 (if (predict? (car l))
-                    (begin 
+                    (begin
                       (set! returns (cons (car l) returns))                   (iter (cdr l)) )
                     (iter (cdr l)))))
           (iter l)))
-  (define (make-the-let-body defines notdefines) 
+  (define (make-the-let-body defines notdefines)
     (if defines
-        (make-the-let-body 
-          (cdr defines) 
-          (cons 
-            (list 'set! 
-                  (definition-variable (car defines)) 
+        (make-the-let-body
+          (cdr defines)
+          (cons
+            (list 'set!
+                  (definition-variable (car defines))
                   (definition-value (car defines)))
             notdefines))
         notdefines))
@@ -52,9 +52,9 @@
   (display (defines))(newline )
   (if (defines)
       body
-      (make-let 
-        (map 
-          (lambda (exp) 
+      (make-let
+        (map
+          (lambda (exp)
                   (list (definition-variable exp) '*unassigned*))
           (defines))
           (make-the-let-body (defines) (notdefines)))))
@@ -65,18 +65,18 @@
 
 
 ; it is better to install in the make-procedure otherwise you have to do the transformation every time the procedure is called
-(interpret 
-'(begin
-  (define (test)
-  (define b 2)
-  (define (c) 3)
-  (+ b (c)))
-(test))
-)
+;(interpret 
+;'(begin
+;  (define (test)
+;  (define b 2)
+;  (define (c) 3)
+;  (+ b (c)))
+;(test))
+;)
 ; Welcome to DrRacket, version 6.7 [3m].
 ; Language: SICP (PLaneT 1.18); memory limit: 128 MB.
 ; 'ok
 ; ((define (c) 3) (define b 2))
 ; ()
 ; 5
-; > 
+; >
