@@ -99,10 +99,7 @@
       (* a b x)
       (+ c d x))))
  3
- 4) 1 1 1 1 1)
-
-
- )
+ 4) 1 1 1 1 1))
 
 (set! eceval-operations
   (append
