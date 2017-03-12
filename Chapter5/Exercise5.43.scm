@@ -17,10 +17,11 @@
 (load "/Users/soulomoon/git/SICP/Chapter5/Exercise5.42.scm")
 
 (define (scan-out-defines body)
-  ;(print "scan-out-defines is on")
+  ;(print "scan-out-defines on")
   (define (notdefinition? exp) (not (definition? exp)))
   (define (filter l predict?)
-    (let ((returns '()))
+    (let ((returns '())
+          (l (reverse l)))
          (define (iter l)
             (if (null? l)
                 returns
@@ -29,51 +30,62 @@
                       (set! returns (cons (car l) returns))                   (iter (cdr l)) )
                     (iter (cdr l)))))
           (iter l)))
-  (define (make-the-let-body defines notdefines)
-    (if defines
-        (make-the-let-body
-          (cdr defines)
-          (cons
-            (list 'set!
-                  (definition-variable (car defines))
-                  (definition-value (car defines)))
-            notdefines))
-        notdefines))
-  (define (defines) (filter body definition?))
-  (define (notdefines) (filter body notdefinition?))
-  ;(display (defines))(newline )
-  (if (defines)
-      body
-      (let->combination
-        (make-let;new
-          (map
-            (lambda (exp)
-                    (list (definition-variable exp) '*unassigned*))
-            (defines))
-            (make-the-let-body (defines) (notdefines))))))
+  (let ((defines (filter body definition?))
+        (notdefines (filter body notdefinition?)))
+        (if (not defines)
+            body
+            (list
+              (apply
+                make-let
+                  (cons
+                    (map
+                      (lambda (exp)
+                              (list (definition-variable exp) "*unassigned*"))
+                      defines)
+                    (append
+                      (map
+                        (lambda (d)
+                          (list 'set!
+                                (definition-variable d)
+                                (definition-value d)))
+                         defines)
+                       notdefines)))))))
 
-(define (compile-lambda-body exp proc-entry ct-env)
-  (let* ((formals (lambda-parameters exp))
-        (ct-env (extend-compile-time-environment formals ct-env)))
-    (append-instruction-sequences
-     (make-instruction-sequence '(env proc argl) '(env)
-      `(,proc-entry
-        (assign env (op compiled-procedure-env) (reg proc))
-        (assign env
-                (op extend-environment)
-                (const ,formals)
-                (reg argl)
-                (reg env))))
-     (compile-sequence (scan-out-defines (lambda-body exp)) 'val 'return ct-env))))
+(define (let? exp)
+  (tagged-list? exp 'let))
+(define (compile exp target linkage ct-env)
+  ;(print ct-env)
+  (cond ((self-evaluating? exp)
+         (compile-self-evaluating exp target linkage ct-env))
+        ((quoted? exp) (compile-quoted exp target linkage ct-env))
+        ((variable? exp)
+         (compile-variable exp target linkage ct-env))
+        ((let? exp)
+         (compile (let->combination exp) target linkage ct-env))
+        ((assignment? exp)
+         (compile-assignment exp target linkage ct-env))
+        ((definition? exp)
+         (compile-definition exp target linkage ct-env))
+        ((if? exp) (compile-if exp target linkage ct-env))
+        ((lambda? exp) (compile-lambda exp target linkage ct-env))
+        ((begin? exp)
+         (compile-sequence (begin-actions exp) target linkage ct-env))
+        ((cond? exp) (compile (cond->if exp) target linkage ct-env))
+        ((application? exp)
+         (compile-application exp target linkage ct-env))
+        (else
+         (error "Unknown expression type -- COMPILE" exp))))
+
+(define (lambda-body exp) (scan-out-defines (cddr exp)))
 
 
 ;(define x
 ;'(begin
-;  (define (test)
+;  (define (test y)
 ;    (define b 2)
 ;    (define (c) 3)
 ;    (+ b (c)))
-;(test)))
+;(test 2)))
 ;
 ;(set! eceval-operations
 ;  (append
@@ -82,6 +94,7 @@
 ;      (list 'make-compiled-procedure make-compiled-procedure)
 ;      (list 'compiled-procedure-env compiled-procedure-env)
 ;      (list 'compiled-procedure-entry compiled-procedure-entry)
+;      (list 'lexical-address-lookup lexical-address-lookup)
 ;      (list 'list list)
 ;      (list 'cons cons)
 ;      (list 'false? false?)
@@ -110,8 +123,9 @@
 
 ;Welcome to DrRacket, version 6.8 [3m].
 ;Language: SICP (PLaneT 1.18); memory limit: 128 MB.
-;{mcons 'COMPILER {mcons 'LOADED '()}}
-;scan-out-defines is on
-;scan-out-defines is on
+;scan-out-defines on
+;scan-out-defines on
+;scan-out-defines on
 ;
 ;λ> 5'done
+;>
