@@ -98,10 +98,10 @@
          (error "return linkage,
                  target not val: COMPILE"
                 target))))
-(go-two
-  '(define (f) (g))
-  '((define (g) (+ 1 1))
-    (f)))
+;(go-two
+;  '(define (f) (g))
+;  '((define (g) (+ 1 1))
+;    (f)))
 
 ;Welcome to DrRacket, version 6.8 [3m].
 ;Language: SICP (PLaneT 1.18); memory limit: 128 MB.
