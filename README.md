@@ -1,5 +1,5 @@
 # SICP  
-Short for the magic book < Structure and Interpretation of Computer Programs >  
+Short for the wizard book < Structure and Interpretation of Computer Programs >  
 For better reading experience, you can find html version here:  
 [Structure and Interpretation of Computer Programs](http://sarabander.github.io/sicp/html/index.xhtml#SEC_Contents)
 
