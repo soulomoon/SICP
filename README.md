@@ -5,7 +5,7 @@ For better reading experience, you can find html version here:
 Here is the place I keep and display my practices for SICP  
 
 ## Credit and resources
-* [wizardbook.wordpress.com](https://wizardbook.wordpress.com/2010/12/25/exercise-4-3/): nice site with help on doing sicp on drracket
+* [wizardbook.wordpress.com](https://wizardbook.wordpress.com/2010/12/25/exercise-4-3/): nice site helping you do sicp exercise on drracket
 * [Chinese Translation related](https://github.com/DeathKing/Learning-SICP)
 
 
