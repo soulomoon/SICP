@@ -2,7 +2,7 @@
 Short for the wizard book < Structure and Interpretation of Computer Programs >  
 For better reading experience, you can find html version here:  
 [Structure and Interpretation of Computer Programs](http://sarabander.github.io/sicp/html/index.xhtml#SEC_Contents)  
-Here is the place I keep and display my practices for SICP  
+Here is the place I keep and display my [practices](https://github.com/soulomoon/SICP) for SICP  
 
 ## Credit and resources
 * [wizardbook.wordpress.com](https://wizardbook.wordpress.com/2010/12/25/exercise-4-3/): nice site helping you do sicp exercise on drracket
