@@ -4,9 +4,11 @@ For better reading experience, you can find html version here:
 [Structure and Interpretation of Computer Programs](http://sarabander.github.io/sicp/html/index.xhtml#SEC_Contents)  
 Here is the place I keep and display my practices for SICP  
 
-## Credit  
+## Credit and resources
 This site gives me a lot of help when trying to find how to use Drracket
-[wizardbook.wordpress.com](https://wizardbook.wordpress.com/2010/12/25/exercise-4-3/)
+* [wizardbook.wordpress.com](https://wizardbook.wordpress.com/2010/12/25/exercise-4-3/)
+* [Chinese Translation related](https://github.com/DeathKing/Learning-SICP)
+
 
 ## Environment
 Most of the practice done here is tested with drracket 
