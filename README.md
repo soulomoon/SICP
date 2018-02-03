@@ -22,4 +22,4 @@ You can find all the code from the book here
 [AlltheCode](https://mitpress.mit.edu/sicp/code/index.html)
 
 ## Contribution
-Welcome to PR any errors
+Welcome to give PRs to fix any error
